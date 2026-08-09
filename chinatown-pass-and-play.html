@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#060c18">
+<title>Chinatown</title>
+<style>
+:root{
+  --bg:#060c18; --panel:#0e1726; --panel2:#131c2b; --panel3:#1c2535;
+  --raise:#1f2837; --active:#232e40; --line:#323843;
+  --gold:#efc469; --gold-hi:#f3cb7a; --gold-dim:#d3b373; --gold-deep:#9c7b31;
+  --paper:#e3dbcd; --muted:#8b939f; --text:#f3eee3; --ink:#1f1000;
+  --hair:rgba(224,184,106,.16); --hair2:rgba(224,184,106,.3);
+  --sans:'Helvetica Neue',Helvetica,-apple-system,system-ui,Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --rail:340px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+body{
+  background:var(--bg);color:var(--text);font-family:var(--sans);
+  -webkit-font-smoothing:antialiased;overscroll-behavior:none;-webkit-text-size-adjust:100%
+}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+input,select{font:inherit}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.eyebrow{font:700 10px/1 var(--sans);letter-spacing:.24em;color:var(--gold-dim);text-transform:uppercase}
+.meta{font:700 10px/1 var(--mono);letter-spacing:.14em;color:var(--muted)}
+
+#app{height:100%;display:flex;flex-direction:column;overflow:hidden}
+
+/* ------------------------------------------------------------- topbar --- */
+.topbar{
+  flex:none;display:flex;align-items:stretch;background:var(--panel);
+  box-shadow:inset 0 -1px 0 var(--hair2);padding-top:env(safe-area-inset-top)
+}
+.mark{
+  flex:none;width:var(--rail);padding:14px 18px;display:flex;flex-direction:column;
+  justify-content:center;gap:6px;box-shadow:inset -1px 0 0 var(--hair)
+}
+.mark b{font:700 clamp(18px,2vw,25px)/1 var(--sans);letter-spacing:.16em;color:var(--gold-hi)}
+.mark span{font:700 9px/1 var(--mono);letter-spacing:.2em;color:var(--muted)}
+.years{flex:1;display:flex;min-width:0}
+.yr{
+  position:relative;flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:3px;box-shadow:inset 1px 0 0 rgba(224,184,106,.12);padding:10px 2px
+}
+.yr b{font:700 clamp(15px,1.8vw,24px)/1 var(--sans);color:var(--text)}
+.yr i{font:700 9px/1 var(--mono);letter-spacing:.16em;color:var(--muted);font-style:normal}
+.yr .bar{position:absolute;left:0;right:0;bottom:0;height:5px;background:transparent}
+.yr.past b{color:#5d6470} .yr.past i{color:#4d545e} .yr.past .bar{background:var(--line)}
+.yr.now{background:var(--paper)} .yr.now b{color:#2c1c05} .yr.now i{color:#6a5836}
+.yr.now .bar{background:var(--gold)}
+.tools{flex:none;display:flex;align-items:center;gap:6px;padding:0 12px}
+.tool{
+  height:38px;padding:0 12px;border-radius:6px;box-shadow:inset 0 0 0 1px var(--hair2);
+  font:700 11px/1 var(--sans);letter-spacing:.12em;color:var(--gold-dim);white-space:nowrap
+}
+.tool:active{background:rgba(224,184,106,.14)}
+.purse{
+  height:38px;display:flex;align-items:center;gap:8px;padding:0 12px;border-radius:6px;
+  background:var(--gold);color:var(--ink);font:700 13px/1 var(--mono);white-space:nowrap
+}
+.purse em{font:700 9px/1 var(--sans);letter-spacing:.14em;font-style:normal;opacity:.7}
+
+/* -------------------------------------------------------------- stage --- */
+.stage{flex:1;display:flex;min-height:0}
+.boardpane{flex:1;min-width:0;padding:18px;display:flex;flex-direction:column;gap:14px;overflow:auto}
+.boardscroll{flex:none}
+.rail{
+  flex:none;width:var(--rail);background:var(--panel);box-shadow:inset 1px 0 0 var(--hair);
+  padding:16px;display:flex;flex-direction:column;gap:12px;overflow-y:auto;
+  padding-bottom:calc(16px + env(safe-area-inset-bottom))
+}
+
+/* -------------------------------------------------------------- board --- */
+.board{
+  width:100%;aspect-ratio:150/92;border-radius:5px;overflow:hidden;
+  background-color:#0b1422;
+  background-image:repeating-linear-gradient(90deg,rgba(255,255,255,.022) 0 1px,transparent 1px 5px);
+  box-shadow:0 20px 44px rgba(0,0,0,.5),inset 0 0 0 1px var(--hair2);
+  display:grid;
+  grid-template-columns:26px 1fr 26px 1.12fr 26px 1fr 26px;
+  grid-template-rows:24px 1.08fr 24px .92fr 26px;
+}
+.stname{
+  display:flex;align-items:center;justify-content:center;text-align:center;
+  font:700 clamp(7px,.72vw,11px)/1 var(--sans);letter-spacing:.36em;color:var(--gold-dim);
+  overflow:hidden;white-space:nowrap
+}
+.stname.v{writing-mode:vertical-rl;text-orientation:mixed;letter-spacing:.3em}
+.blk{
+  border-radius:3px;padding:clamp(5px,.7vw,11px);display:grid;grid-auto-rows:1fr;gap:clamp(3px,.45vw,6px);
+  background-color:var(--paper);
+  background-image:
+    repeating-linear-gradient(0deg,rgba(90,72,40,.05) 0 1px,transparent 1px 3px),
+    repeating-linear-gradient(90deg,rgba(90,72,40,.04) 0 1px,transparent 1px 4px),
+    radial-gradient(140% 120% at 30% 0%,rgba(255,253,247,.85),rgba(224,214,193,.5));
+  box-shadow:0 3px 10px rgba(0,0,0,.45),inset 0 0 0 1px rgba(60,50,30,.2),inset 0 1px 0 rgba(255,255,255,.6)
+}
+.landmark{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;
+  border:1px solid rgba(40,34,20,.3);border-radius:2px;background:rgba(40,34,20,.09);text-align:center;padding:2px
+}
+.landmark b{font:700 clamp(7px,.72vw,10px)/1.1 var(--sans);letter-spacing:.1em;color:rgba(38,32,18,.75)}
+.landmark span{font:700 clamp(6px,.6vw,8px)/1 var(--mono);letter-spacing:.1em;color:rgba(38,32,18,.5)}
+.lot{
+  position:relative;min-width:0;min-height:0;display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(40,34,20,.22);border-radius:2px;background:rgba(255,255,255,.34);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.6);transition:transform .1s ease
+}
+.lot:active{transform:scale(.95)}
+.lot .ln{position:absolute;top:2px;left:3px;font:700 clamp(6px,.62vw,9px)/1 var(--mono);color:rgba(38,32,18,.55)}
+.lot .sign{
+  display:flex;align-items:center;justify-content:center;gap:1px;
+  width:78%;height:62%;border-radius:2px;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.22),0 1px 0 rgba(255,255,255,.5)
+}
+.lot .sign em{font-style:normal;font-size:clamp(10px,1.35vw,19px);line-height:1}
+.lot .sign i{font:700 clamp(6px,.6vw,9px)/1 var(--mono);font-style:normal;opacity:.85}
+.lot .own{
+  position:absolute;right:3px;bottom:3px;width:clamp(8px,.95vw,13px);height:clamp(8px,.95vw,13px);
+  border-radius:50%;box-shadow:0 0 0 1.5px rgba(250,247,240,.9),0 1px 2px rgba(0,0,0,.4)
+}
+.lot.sel{outline:3px solid var(--gold);outline-offset:-3px}
+.lot.offer{background:rgba(239,196,105,.5);box-shadow:inset 0 0 0 2px var(--gold-deep)}
+@media (prefers-reduced-motion:no-preference){
+  .lot.offer{animation:blip 1.7s ease-in-out infinite}
+  @keyframes blip{0%,100%{box-shadow:inset 0 0 0 2px var(--gold-deep)}50%{box-shadow:inset 0 0 0 3px var(--gold),0 0 12px rgba(239,196,105,.55)}}
+}
+.lot.chosen{background:var(--gold);box-shadow:inset 0 0 0 2px #7a5c1c}
+.lot.chosen .ln{color:rgba(30,20,0,.75)}
+.lot.free{outline:2px dashed var(--gold);outline-offset:-3px;background:rgba(239,196,105,.28)}
+.lot.mute{opacity:.2}
+.lot.pin::after{
+  content:'';position:absolute;inset:-2px;border-radius:3px;
+  box-shadow:0 0 0 2px var(--gold),0 0 14px rgba(239,196,105,.7);pointer-events:none
+}
+
+/* ------------------------------------------------------------- legend --- */
+.legend{flex:none;border-radius:8px;background:var(--panel2);box-shadow:inset 0 0 0 1px var(--hair);padding:10px 12px 12px}
+.legend .hd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px;flex-wrap:wrap}
+.chips{display:flex;gap:6px}
+.chips button{
+  flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+  padding:8px 2px;border-radius:5px;background:var(--panel3);box-shadow:inset 0 0 0 1px rgba(224,184,106,.12)
+}
+.chips button.on{background:var(--active);box-shadow:inset 0 0 0 2px var(--gold)}
+.chips .sw{
+  display:flex;align-items:center;justify-content:center;gap:1px;width:30px;height:24px;border-radius:2px;
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.22);font-size:15px;line-height:1
+}
+.chips .sw i{font:700 8px/1 var(--mono);font-style:normal;opacity:.85}
+.chips .nm{font:700 9px/1.15 var(--sans);letter-spacing:.04em;text-align:center;color:var(--muted)}
+.chips button.on .nm{color:var(--gold-hi)}
+
+/* --------------------------------------------------------------- rail --- */
+.seat{
+  display:flex;align-items:center;gap:11px;width:100%;min-height:58px;padding:8px 12px;border-radius:6px;
+  text-align:left;background:var(--panel3);box-shadow:inset 0 0 0 1px rgba(224,184,106,.1)
+}
+.seat.turn{background:var(--active);box-shadow:inset 4px 0 0 var(--gold),inset 0 0 0 1px var(--hair2)}
+.seat .disc{width:24px;height:24px;border-radius:50%;flex:none;box-shadow:0 0 0 2px rgba(250,247,240,.85),0 2px 4px rgba(0,0,0,.45)}
+.seat .who{flex:1;min-width:0}
+.seat .who b{display:block;font:700 15px/1.2 var(--sans);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.seat .who span{display:block;margin-top:3px;font:700 9px/1 var(--mono);letter-spacing:.12em;color:var(--muted)}
+.seat.turn .who span{color:var(--gold-dim)}
+.seat .cash{font:700 14px/1 var(--mono);color:var(--gold-hi);white-space:nowrap}
+.seat .cash.hid{color:#4f5764;letter-spacing:.05em}
+
+.pane{border-radius:8px;background:var(--panel3);box-shadow:inset 0 0 0 1px rgba(224,184,106,.18);padding:14px}
+.pane + .pane{margin-top:0}
+.segs{display:flex;gap:4px;margin:11px 0 13px}
+.segs span{flex:1;height:6px;border-radius:3px;background:var(--line)}
+.segs span.done{background:#6b5a30}
+.segs span.now{flex:1.6;background:var(--gold)}
+.pane h2{margin:0;font:700 clamp(19px,2.2vw,26px)/1 var(--sans);letter-spacing:.01em}
+.pane p{margin:8px 0 0;font:400 13px/1.45 var(--sans);color:#a8b0bc}
+.pane .foot{
+  margin-top:11px;padding-top:11px;display:flex;justify-content:space-between;gap:8px;
+  box-shadow:inset 0 1px 0 var(--hair);font:700 9px/1 var(--mono);letter-spacing:.12em;color:var(--muted)
+}
+.rowbet{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.grp{display:flex;flex-direction:column;gap:12px}
+.rail .people{order:1}.rail .play{order:2}.rail .info{order:3}
+.swipe{display:none;text-align:center;padding:8px 0 0}
+
+.act{
+  display:block;width:100%;height:56px;border-radius:8px;background:var(--gold);color:var(--ink);
+  font:700 14px/1 var(--sans);letter-spacing:.14em;box-shadow:0 3px 0 var(--gold-deep);margin-top:10px
+}
+.act:active{transform:translateY(3px);box-shadow:none}
+.act.quiet{background:transparent;color:var(--gold-hi);box-shadow:inset 0 0 0 1px var(--gold-dim)}
+.act.quiet:active{transform:none;background:rgba(224,184,106,.14)}
+.act.slim{height:44px;font-size:12px}
+.act[disabled]{opacity:.35;box-shadow:0 3px 0 var(--gold-deep)}
+.act[disabled]:active{transform:none}
+
+.cards{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.deed{
+  width:62px;height:84px;border-radius:5px;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:2px;background:var(--paper);color:#2a2115;
+  box-shadow:0 3px 0 rgba(0,0,0,.4),inset 0 0 0 1px rgba(60,50,30,.25)
+}
+.deed b{font:700 23px/1 var(--mono)}
+.deed span{font:700 8px/1.1 var(--sans);letter-spacing:.08em;color:#7b6a49;text-align:center;padding:0 3px}
+.deed.on{background:var(--gold);box-shadow:0 3px 0 var(--gold-deep),inset 0 0 0 2px #7a5c1c}
+
+.rack{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.tile{
+  min-width:62px;flex:1 0 auto;border-radius:5px;padding:7px 6px;display:flex;flex-direction:column;
+  align-items:center;gap:3px;box-shadow:inset 0 0 0 1px rgba(0,0,0,.25),0 2px 0 rgba(0,0,0,.35)
+}
+.tile em{font-style:normal;font-size:18px;line-height:1}
+.tile b{font:700 9px/1.1 var(--sans);letter-spacing:.05em;text-align:center}
+.tile i{font:700 8px/1 var(--mono);font-style:normal;opacity:.8}
+.tile.on{outline:3px solid var(--gold);outline-offset:2px;transform:translateY(-2px)}
+.none{font:400 12px/1.4 var(--sans);color:var(--muted);font-style:italic;margin-top:8px}
+
+table.led{width:100%;border-collapse:collapse;font:400 13px/1.3 var(--sans)}
+table.led th,table.led td{padding:7px 6px;text-align:right;box-shadow:inset 0 -1px 0 rgba(224,184,106,.1)}
+table.led th:first-child,table.led td:first-child{text-align:left}
+table.led th{font:700 9px/1 var(--mono);letter-spacing:.14em;color:var(--muted)}
+table.led td.n{font-family:var(--mono)}
+table.led td.g{font-family:var(--mono);color:var(--gold-hi)}
+
+/* ------------------------------------------------------------ overlay --- */
+.veil{
+  position:fixed;inset:0;z-index:60;display:flex;align-items:center;justify-content:center;padding:16px;
+  background:var(--bg);background-image:radial-gradient(70% 60% at 50% 42%,rgba(224,184,106,.14),transparent 70%)
+}
+.veil.soft{background:rgba(6,12,24,.9)}
+.sheet{
+  width:min(760px,100%);max-height:90vh;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  background:var(--panel2);border-radius:10px;box-shadow:inset 0 0 0 1px var(--hair2),0 30px 80px rgba(0,0,0,.6)
+}
+.sheet header{
+  position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:12px;padding:14px 18px;
+  background:var(--panel2);box-shadow:inset 0 -1px 0 var(--hair)
+}
+.sheet header h3{flex:1;margin:0;font:700 14px/1 var(--sans);letter-spacing:.2em;text-transform:uppercase;color:var(--gold-hi)}
+.sheet .in{padding:18px}
+.xb{width:38px;height:38px;border-radius:50%;background:var(--panel3);font-size:17px}
+
+.pass{text-align:center;max-width:680px;padding:20px}
+.pass .lead{font:700 12px/1 var(--sans);letter-spacing:.42em;color:var(--gold-dim)}
+.pass .name{
+  margin:22px 0 0;display:flex;align-items:center;justify-content:center;gap:clamp(12px,3vw,26px);flex-wrap:wrap
+}
+.pass .name span{
+  width:clamp(38px,7vw,64px);height:clamp(38px,7vw,64px);border-radius:50%;
+  box-shadow:0 0 0 4px rgba(250,247,240,.9),0 6px 20px rgba(0,0,0,.5)
+}
+.pass .name b{font:700 clamp(40px,10vw,104px)/1 var(--sans);letter-spacing:-.02em}
+.pass .strip{
+  margin-top:22px;display:flex;align-items:center;justify-content:center;gap:14px;flex-wrap:wrap;
+  font:700 12px/1 var(--mono);letter-spacing:.18em;color:var(--muted)
+}
+.pass .strip s{width:5px;height:5px;border-radius:50%;background:var(--gold-deep);text-decoration:none}
+.pass .say{
+  margin-top:34px;display:inline-block;padding:13px 24px;border-radius:6px;background:rgba(255,255,255,.05);
+  font:400 16px/1.3 var(--sans);color:#b9c0cb
+}
+.pass .go{
+  margin-top:28px;height:74px;padding:0 clamp(24px,6vw,62px);border-radius:8px;background:var(--gold);
+  color:var(--ink);font:700 clamp(15px,2vw,20px)/1 var(--sans);letter-spacing:.12em;box-shadow:0 4px 0 var(--gold-deep)
+}
+.pass .go:active{transform:translateY(4px);box-shadow:none}
+.pass .no{margin-top:16px;height:46px;padding:0 22px;font:700 12px/1 var(--sans);letter-spacing:.18em;color:var(--muted)}
+
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.side{border-radius:8px;background:var(--panel3);box-shadow:inset 0 0 0 1px var(--hair);padding:12px}
+.lbl{font:700 9px/1 var(--mono);letter-spacing:.16em;color:var(--muted);margin:14px 0 7px}
+.lbl:first-child{margin-top:0}
+select,input[type=text]{width:100%;padding:10px;border-radius:6px;background:var(--panel);color:var(--text);border:1px solid var(--line)}
+.pills{display:flex;flex-wrap:wrap;gap:6px}
+.pill{
+  padding:7px 9px;border-radius:5px;background:var(--panel);box-shadow:inset 0 0 0 1px var(--line);
+  font:700 11px/1 var(--sans);letter-spacing:.03em;display:flex;align-items:center;gap:5px
+}
+.pill.on{background:var(--gold);color:var(--ink);box-shadow:none}
+.pill .cd{width:9px;height:9px;border-radius:2px}
+.big{font:700 clamp(30px,7vw,46px)/1 var(--mono);color:var(--gold-hi);text-align:center;margin:10px 0}
+
+.rank{display:flex;align-items:center;gap:12px;padding:12px 0;box-shadow:inset 0 -1px 0 var(--hair)}
+.rank .pos{font:700 24px/1 var(--sans);width:34px;color:var(--gold)}
+.rank .amt{margin-left:auto;font:700 17px/1 var(--mono)}
+.rank.top{background:linear-gradient(90deg,rgba(239,196,105,.16),transparent)}
+
+.logl{font:400 12.5px/1.5 var(--sans);color:#a8b0bc}
+.logl div{padding:6px 0;box-shadow:inset 0 -1px 0 rgba(224,184,106,.08)}
+.logl .yy{font:700 10px/1 var(--mono);letter-spacing:.16em;color:var(--gold-dim);text-transform:uppercase}
+
+.toast{
+  position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:99;max-width:90vw;text-align:center;
+  padding:11px 18px;border-radius:30px;background:var(--paper);color:#1b1408;font:700 13px/1.3 var(--sans);
+  box-shadow:0 10px 30px rgba(0,0,0,.5)
+}
+@media (prefers-reduced-motion:no-preference){
+  .toast{animation:rise .18s ease}@keyframes rise{from{opacity:0;transform:translate(-50%,10px)}}
+}
+
+/* ---------------------------------------------------------- responsive --- */
+@media (max-width:1180px){ :root{--rail:300px} .mark{width:auto;min-width:170px} }
+@media (max-width:900px){
+  .rail .play{order:1}.rail .info{order:2}.rail .people{order:3}
+  .stage{flex-direction:column;overflow-y:auto}
+  .boardpane{overflow:visible;padding:12px}
+  .rail{width:100%;box-shadow:inset 0 1px 0 var(--hair);overflow:visible}
+  .mark{width:auto;min-width:0;padding:12px 14px}
+  .mark span{display:none}
+  .topbar{flex-wrap:wrap}
+  .years{order:3;width:100%;flex:1 0 100%;box-shadow:inset 0 1px 0 var(--hair)}
+  .tools{margin-left:auto;padding:8px 12px;gap:5px;overflow-x:auto;max-width:100%}
+  .tool{height:34px;padding:0 9px;font-size:10px}
+  .mark b{font-size:17px}
+}
+@media (max-width:720px){
+  .boardscroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:0 -12px;padding:0 12px}
+  .board{min-width:620px}
+  .swipe{display:block}
+  .chips{overflow-x:auto;padding-bottom:4px}
+  .chips button{flex:0 0 62px}
+  .two{grid-template-columns:1fr}
+  .yr b{font-size:14px} .yr i{font-size:8px}
+  .veil{padding:10px}
+}
+@media (max-width:420px){
+  .tool{padding:0 7px;letter-spacing:.06em}
+  .purse{padding:0 9px;font-size:12px}
+  .deed{width:56px;height:76px}
+}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* ==========================================================================
+   CHINATOWN — offline pass-and-play. Single file, no network, no libraries.
+   ========================================================================== */
+
+/* ----------------------------------------------------------------- data --- */
+// 12 shop types. `max` = tiles needed to complete. Each type has max+3 copies.
+const SHOPS = [
+  {k:'photo',  n:'Photo',      max:3, g:'📷', bg:'#ac3031', fg:'#f8f1e3'},
+  {k:'sea',    n:'Seafood',    max:3, g:'🦐', bg:'#00606a', fg:'#f8f1e3'},
+  {k:'flower', n:'Florist',    max:3, g:'🌸', bg:'#c25485', fg:'#fdf6ea'},
+  {k:'tea',    n:'Tea House',  max:4, g:'🍵', bg:'#186b45', fg:'#f8f1e3'},
+  {k:'take',   n:'Take Out',   max:4, g:'🥡', bg:'#dc701c', fg:'#261704'},
+  {k:'laundry',n:'Laundry',    max:4, g:'🧺', bg:'#b4d3e3', fg:'#192a3c'},
+  {k:'dimsum', n:'Dim Sum',    max:5, g:'🥟', bg:'#deba42', fg:'#261704'},
+  {k:'fish',   n:'Trop. Fish', max:5, g:'🐠', bg:'#21abb8', fg:'#0f2a30'},
+  {k:'jewel',  n:'Jewellery',  max:5, g:'💍', bg:'#d5aa4f', fg:'#261704'},
+  {k:'rest',   n:'Restaurant', max:6, g:'🍜', bg:'#68101f', fg:'#e9c57d'},
+  {k:'antique',n:'Antiques',   max:6, g:'🏺', bg:'#4b3860', fg:'#f3eaf8'},
+  {k:'factory',n:'Factory',    max:6, g:'🏭', bg:'#636a71', fg:'#f8f1e3'},
+];
+const SHOP = Object.fromEntries(SHOPS.map(s=>[s.k,s]));
+
+const PAY_PART = {1:10000, 2:20000, 3:40000, 4:60000, 5:80000};
+const PAY_FULL = {3:50000, 4:80000, 5:110000, 6:140000};
+
+// [cards dealt, cards kept]. Cards kept also equals shop tiles drawn that round.
+const DEAL = {
+  3:[[7,5],[6,4],[6,4],[6,4],[6,4],[6,4]],
+  4:[[6,4],[5,3],[5,3],[5,3],[5,3],[5,3]],
+  5:[[5,3],[5,3],[5,3],[4,2],[4,2],[4,2]],
+};
+
+const YEARS = [
+  {y:1965,z:'SNAKE'},{y:1966,z:'HORSE'},{y:1967,z:'GOAT'},
+  {y:1968,z:'MONKEY'},{y:1969,z:'ROOSTER'},{y:1970,z:'DOG'}
+];
+
+const COLORS = [
+  {k:'red',   n:'Red',    hex:'#e94a2f'},
+  {k:'jade',  n:'Jade',   hex:'#2eb184'},
+  {k:'blue',  n:'Blue',   hex:'#3d7ede'},
+  {k:'gold',  n:'Gold',   hex:'#efb146'},
+  {k:'rose',  n:'Rose',   hex:'#c348a7'},
+];
+
+const PHASES = ['deal','tiles','trade','build','income'];
+const PHASE_COPY = {
+  deal:{t:'DEAL BUILDINGS', d:'Everyone takes a fistful of building cards, keeps a few, and stakes a marker on each lot they keep.'},
+  tiles:{t:'DRAW TILES',    d:'Shop tiles come out of the bag blind, then everyone turns them face up at the same moment.'},
+  trade:{t:'NEGOTIATION',   d:'Lots, built shops, loose tiles and cash — all of it is on the table, all at once. Record deals as you strike them.'},
+  build:{t:'BUILD SHOPS',   d:'In turn order, put tiles on your own empty lots. Once a sign goes up it never comes down.'},
+  income:{t:'SETTLE RENTS', d:'Every business pays. Bigger and finished beats scattered and half-built.'},
+};
+
+const START_MONEY = 50000, MARKERS = 30;
+
+/* ---------------------------------------------------------------- board --- */
+// Six paper blocks between the streets. Landmarks are dead cells: they break
+// adjacency the same way a street does.
+const BLOCKS = [
+  {k:'A', st:'Baxter St',   area:'2/2/3/3', cols:4, cells:16, mark:null},
+  {k:'B', st:'Mulberry St', area:'2/4/3/5', cols:4, cells:16, mark:{span:2,t:'C.C.B.A. HALL',s:'NOT FOR SALE'}},
+  {k:'C', st:'Mott St',     area:'2/6/3/7', cols:4, cells:16, mark:null},
+  {k:'D', st:'Bayard St',   area:'4/2/5/3', cols:4, cells:12, mark:{span:2,t:'COLUMBUS PARK',s:'CITY LAND'}},
+  {k:'E', st:'Doyers St',   area:'4/4/5/5', cols:5, cells:15, mark:null},
+  {k:'F', st:'Pell St',     area:'4/6/5/7', cols:5, cells:15, mark:{span:1,t:'KIMLAU SQ.',s:'MEMORIAL'}},
+];
+
+const LOTS=[], LOT={}; let _id=1;
+for(const b of BLOCKS){
+  b.lots=[]; const skip=b.mark?b.mark.span:0;
+  for(let cell=skip; cell<b.cells; cell++){
+    const p={id:_id++, blk:b.k, st:b.st, cell, row:Math.floor(cell/b.cols), col:cell%b.cols};
+    LOTS.push(p); LOT[p.id]=p; b.lots.push(p.id);
+  }
+}
+const ALL_IDS = LOTS.map(p=>p.id);
+const NEIGH = {};
+for(const p of LOTS){
+  NEIGH[p.id]=LOTS.filter(q=>q.blk===p.blk && Math.abs(q.row-p.row)+Math.abs(q.col-p.col)===1).map(q=>q.id);
+}
+const addr = id => id+' '+LOT[id].st;
+
+/* ------------------------------------------------------------------ rng --- */
+function rnd(n){
+  if(n<=1) return 0;
+  const c=window.crypto||window.msCrypto;
+  if(c&&c.getRandomValues){
+    const lim=Math.floor(0x100000000/n)*n, a=new Uint32Array(1);
+    let v; do{ c.getRandomValues(a); v=a[0]; } while(v>=lim);
+    return v%n;
+  }
+  return Math.floor(Math.random()*n);
+}
+function shuffle(a){ for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]];} return a; }
+function draw(pile,k){ const o=[]; for(let i=0;i<k&&pile.length;i++) o.push(pile.splice(rnd(pile.length),1)[0]); return o; }
+
+/* ---------------------------------------------------------------- state --- */
+let S=null, UI={}, HISTORY=[];
+const money = v => (v<0?'-$':'$')+Math.abs(v).toLocaleString('en-US');
+const clone = o => JSON.parse(JSON.stringify(o));
+const pl = i => S.players[i];
+const cur = () => S.players[S.turn];
+const hex = i => COLORS.find(c=>c.k===pl(i).color).hex;
+
+function newGame(names,colors){
+  const bag=[]; for(const s of SHOPS) for(let i=0;i<s.max+3;i++) bag.push(s.k);
+  S={
+    players:names.map((n,i)=>({id:i,name:n,color:colors[i],money:START_MONEY,tiles:[]})),
+    plots:Object.fromEntries(ALL_IDS.map(id=>[id,{owner:null,shop:null}])),
+    deck:[], bag, round:1, phase:'deal', first:rnd(names.length), turn:0,
+    deal:null, log:[]
+  };
+  S.turn=S.first;
+  log('yy','Year 1965 · the snake');
+  log('', cur().name+' holds the first player card.');
+  startDeal();
+}
+function log(k,t){ S.log.unshift({k,t}); }
+function snapshot(){ HISTORY.push(clone(S)); if(HISTORY.length>40) HISTORY.shift(); }
+function undo(){
+  if(!HISTORY.length) return toast('Nothing to undo');
+  S=HISTORY.pop(); UI.selTile=null; UI.pick=null; save(); render(); toast('Undone');
+}
+
+const store={
+  async set(v){ try{ if(window.storage) await window.storage.set('chinatown:save',JSON.stringify(v),false);}catch(e){} },
+  async get(){ try{ if(window.storage){const r=await window.storage.get('chinatown:save'); return r?JSON.parse(r.value):null;} }catch(e){} return null; },
+  async del(){ try{ if(window.storage) await window.storage.delete('chinatown:save',false);}catch(e){} }
+};
+let saveT=null;
+function save(){ clearTimeout(saveT); saveT=setTimeout(()=>{ if(S) store.set(S); },250); }
+
+/* -------------------------------------------------------------- helpers --- */
+const ownedBy = i => ALL_IDS.filter(id=>S.plots[id].owner===i);
+const vacantOwnedBy = i => ownedBy(i).filter(id=>!S.plots[id].shop);
+const markersLeft = i => MARKERS - ownedBy(i).length;
+const tilesOnBoard = i => ALL_IDS.filter(id=>S.plots[id].owner===i && S.plots[id].shop).length;
+
+function businesses(owner){
+  const seen=new Set(), out=[];
+  for(const id of ALL_IDS){
+    const st=S.plots[id];
+    if(!st.shop || st.owner!==owner || seen.has(id)) continue;
+    const grp=[], q=[id]; seen.add(id);
+    while(q.length){
+      const a=q.pop(); grp.push(a);
+      for(const b of NEIGH[a]){
+        const nb=S.plots[b];
+        if(!seen.has(b) && nb.shop===st.shop && nb.owner===owner){ seen.add(b); q.push(b); }
+      }
+    }
+    const s=SHOP[st.shop], full=Math.floor(grp.length/s.max), rem=grp.length%s.max;
+    for(let i=0;i<full;i++) out.push({shop:st.shop,size:s.max,complete:true,pay:PAY_FULL[s.max]});
+    if(rem) out.push({shop:st.shop,size:rem,complete:false,pay:PAY_PART[rem]});
+  }
+  return out;
+}
+const incomeFor = i => businesses(i).reduce((a,b)=>a+b.pay,0);
+
+/* --------------------------------------------------------------- phases --- */
+const orderFrom = f => S.players.map((_,i)=>(f+i)%S.players.length);
+
+function startDeal(){
+  S.phase='deal';
+  S.deck=shuffle(ALL_IDS.filter(id=>S.plots[id].owner===null));
+  S.deal={order:orderFrom(S.first), i:0, discard:[], drawn:null};
+  S.turn=S.first; UI.me=null; UI.pick=null;
+}
+function dealGo(){
+  const who=S.deal.order[S.deal.i];
+  gate(who,'Nobody else should see which cards you keep.',()=>{
+    snapshot();
+    const [nD]=DEAL[S.players.length][S.round-1];
+    S.deal.drawn=draw(S.deck,Math.min(nD,S.deck.length));
+    UI.pick=new Set(); UI.me=who;
+  });
+}
+function confirmKeep(){
+  const d=S.deal, who=d.order[d.i], [,nK]=DEAL[S.players.length][S.round-1];
+  const need=Math.min(nK,d.drawn.length);
+  if(UI.pick.size!==need) return;
+  for(const id of UI.pick) S.plots[id].owner=who;
+  d.discard.push(...d.drawn.filter(id=>!UI.pick.has(id)));
+  log('', pl(who).name+' claimed '+[...UI.pick].sort((a,b)=>a-b).join(', ')+'.');
+  d.drawn=null; d.i++; UI.pick=null; UI.me=null; UI.sel=null;
+  if(d.i>=d.order.length){ S.deck.push(...d.discard); shuffle(S.deck); S.phase='tiles'; }
+  else S.turn=d.order[d.i];
+  save(); render();
+}
+function drawTiles(){
+  snapshot();
+  const [,n]=DEAL[S.players.length][S.round-1];
+  for(const i of orderFrom(S.first)) pl(i).tiles.push(...draw(S.bag,n));
+  log('','Shop tiles drawn and revealed. '+S.bag.length+' left in the bag.');
+  S.phase='trade'; save(); render();
+}
+function endTrade(){ snapshot(); S.phase='build'; S.turn=S.first; UI.selTile=null; save(); render(); }
+function placeTile(id){
+  const i=S.turn, p=pl(i), idx=UI.selTile, st=S.plots[id];
+  if(idx==null) return;
+  if(st.owner!==i||st.shop) return toast('Build only on your own empty lots');
+  snapshot();
+  const k=p.tiles.splice(idx,1)[0];
+  st.shop=k;
+  log('', p.name+' opened a '+SHOP[k].n+' at '+addr(id)+'.');
+  UI.selTile=null; save(); render();
+}
+function endBuild(){
+  snapshot(); UI.selTile=null;
+  const ord=orderFrom(S.first), pos=ord.indexOf(S.turn);
+  if(pos<ord.length-1) S.turn=ord[pos+1]; else S.phase='income';
+  save(); render();
+}
+function payout(){
+  snapshot();
+  for(const p of S.players){ const inc=incomeFor(p.id); p.money+=inc; log('', p.name+' collected '+money(inc)+'.'); }
+  if(S.round===6){ S.phase='over'; log('yy','The books are closed'); save(); render(); return openSheet('end'); }
+  S.round++; S.first=(S.first+1)%S.players.length;
+  log('yy','Year '+YEARS[S.round-1].y+' · the '+YEARS[S.round-1].z.toLowerCase());
+  log('', pl(S.first).name+' takes the first player card.');
+  startDeal(); save(); render();
+}
+/* ================================================================ render === */
+const app=document.getElementById('app');
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function render(){
+  if(!S) return renderSetup();
+  app.innerHTML = topbar() + '<div class="stage">'
+    + '<div class="boardpane"><div class="boardscroll">'+board()+'</div>'
+    + '<div class="swipe meta">SWIPE THE MAP SIDEWAYS TO SEE THE WHOLE NEIGHBOURHOOD</div>'
+    + legend()+'</div>'
+    + '<aside class="rail">'+rail()+'</aside></div>';
+  renderSheet();
+}
+
+function topbar(){
+  const purse = UI.me!=null
+    ? `<button class="purse" data-act="hide-me"><em>YOU</em>${money(pl(UI.me).money)}</button>`
+    : `<button class="tool" data-act="whoami">MY CASH</button>`;
+  return `<header class="topbar">
+    <div class="mark"><b>CHINATOWN</b><span>PROPERTY NEGOTIATION · SIX YEARS</span></div>
+    <div class="years">${YEARS.map((v,i)=>{
+      const c = i+1<S.round?'past' : i+1===S.round?'now':'';
+      return `<div class="yr ${c}"><b>${v.y}</b><i>${v.z}</i><span class="bar"></span></div>`;}).join('')}</div>
+    <div class="tools">${purse}
+      <button class="tool" data-act="trade">TRADE</button>
+      <button class="tool" data-act="log">LOG</button>
+      <button class="tool" data-act="rules">RULES</button>
+      <button class="tool" data-act="undo">UNDO</button>
+      <button class="tool" data-act="menu">⋯</button>
+    </div></header>`;
+}
+
+/* which lots are live for tapping, and how they read */
+function boardFlags(){
+  const f={offer:new Set(), chosen:new Set(), free:new Set()};
+  if(S.phase==='deal' && S.deal.drawn){
+    for(const id of S.deal.drawn) (UI.pick && UI.pick.has(id) ? f.chosen : f.offer).add(id);
+  }
+  if(S.phase==='build' && UI.selTile!=null) for(const id of vacantOwnedBy(S.turn)) f.free.add(id);
+  return f;
+}
+
+function board(){
+  const f=boardFlags(), filter=UI.filter;
+  const st=(a,cls,txt)=>`<div class="stname ${cls}" style="grid-area:${a}">${txt}</div>`;
+  let h='<div class="board">'
+    + st('1/2/2/8','','CANAL STREET') + st('5/1/6/8','','WORTH STREET')
+    + st('2/1/5/2','v','BAXTER STREET') + st('2/7/5/8','v','THE BOWERY')
+    + st('2/3/5/4','v','MULBERRY STREET') + st('2/5/5/6','v','MOTT STREET')
+    + st('3/2/4/3','','BAYARD STREET') + st('3/4/4/5','','DOYERS STREET') + st('3/6/4/7','','PELL STREET');
+
+  for(const b of BLOCKS){
+    h+=`<div class="blk" style="grid-area:${b.area};grid-template-columns:repeat(${b.cols},1fr)">`;
+    if(b.mark) h+=`<div class="landmark" style="grid-column:span ${b.mark.span}"><b>${b.mark.t}</b><span>${b.mark.s}</span></div>`;
+    for(const id of b.lots){
+      const p=S.plots[id], cls=['lot'];
+      if(f.chosen.has(id)) cls.push('chosen'); else if(f.offer.has(id)) cls.push('offer');
+      if(f.free.has(id)) cls.push('free');
+      if(UI.sel===id) cls.push('sel');
+      if(filter && p.shop!==filter) cls.push('mute');
+      let inner=`<span class="ln">${id}</span>`;
+      if(p.shop){ const s=SHOP[p.shop];
+        inner+=`<span class="sign" style="background:${s.bg};color:${s.fg}"><em>${s.g}</em><i>${s.max}</i></span>`; }
+      if(p.owner!==null) inner+=`<span class="own" style="background:${hex(p.owner)}"></span>`;
+      h+=`<button class="${cls.join(' ')}" data-lot="${id}">${inner}</button>`;
+    }
+    h+='</div>';
+  }
+  return h+'</div>';
+}
+
+function legend(){
+  const f=UI.filter;
+  return `<div class="legend">
+    <div class="hd"><span class="eyebrow">Shop signs · tap to find on the board</span>
+      <span class="meta" style="${f?'color:var(--gold-hi)':''}">${f?'SHOWING '+SHOP[f].n.toUpperCase()+' — TAP AGAIN TO CLEAR':'ALL SIGNS SHOWN'}</span></div>
+    <div class="chips">${SHOPS.map(s=>`<button class="${f===s.k?'on':''}" data-act="filter" data-k="${s.k}">
+      <span class="sw" style="background:${s.bg};color:${s.fg}">${s.g}<i>${s.max}</i></span>
+      <span class="nm">${s.n.toUpperCase()}</span></button>`).join('')}</div></div>`;
+}
+
+/* ------------------------------------------------------------------ rail --- */
+function rail(){
+  return `<div class="grp people">${roster()}</div>`
+       + `<div class="grp play">${phasePane()}${contextPane()}</div>`
+       + `<div class="grp info">${lotPane()}</div>`;
+}
+
+function roster(){
+  return `<div class="rowbet"><span class="eyebrow">At the table</span>
+    <span class="meta">${S.players.length} PLAYERS</span></div>`
+  + S.players.map(p=>{
+      const mine=UI.me===p.id, turn=(S.phase==='build'||S.phase==='deal')&&S.turn===p.id;
+      const sub=[ownedBy(p.id).length+' LOTS', p.tiles.length+' TILES'];
+      if(S.first===p.id) sub.push('FIRST');
+      if(turn) sub.push('UP NOW');
+      return `<button class="seat ${turn?'turn':''}" data-act="peek" data-i="${p.id}">
+        <span class="disc" style="background:${hex(p.id)}"></span>
+        <span class="who"><b>${esc(p.name)}</b><span>${sub.join(' · ')}</span></span>
+        <span class="cash ${mine?'':'hid'}">${mine?money(p.money):'••••••'}</span></button>`;
+    }).join('');
+}
+
+function phasePane(){
+  const idx=PHASES.indexOf(S.phase);
+  const c=PHASE_COPY[S.phase]||{t:'FINAL ACCOUNTS',d:'Six years done. Count the money.'};
+  const nxt=idx>=0&&idx<4?PHASE_COPY[PHASES[idx+1]].t:'THE END';
+  return `<div class="pane">
+    <div class="rowbet"><span class="eyebrow">${idx>=0?'Phase '+(idx+1)+' of 5':'Game over'}</span>
+      <span class="meta">${YEARS[Math.min(S.round,6)-1].y} · ${YEARS[Math.min(S.round,6)-1].z}</span></div>
+    <div class="segs">${PHASES.map((p,i)=>`<span class="${i===idx?'now':(idx>i?'done':'')}"></span>`).join('')}</div>
+    <h2>${c.t}</h2><p>${c.d}</p>
+    <div class="foot"><span>NEXT · ${nxt}</span><span>BAG · ${S.bag.length} TILES</span></div>
+  </div>`;
+}
+
+function contextPane(){
+  const P=S.phase;
+  if(P==='deal')   return paneDeal();
+  if(P==='tiles')  return paneTiles();
+  if(P==='trade')  return paneTrade();
+  if(P==='build')  return paneBuild();
+  if(P==='income') return paneIncome();
+  if(P==='over')   return paneOver();
+  return '';
+}
+
+function paneDeal(){
+  const d=S.deal, [nD,nK]=DEAL[S.players.length][S.round-1];
+  if(d.i>=d.order.length) return '';
+  const who=pl(d.order[d.i]);
+  if(!d.drawn){
+    return `<div class="pane"><span class="eyebrow">Waiting on</span>
+      <h2 style="margin-top:8px">${esc(who.name).toUpperCase()}</h2>
+      <p>${nD} cards each, keep ${nK}. Hand the screen over before tapping.</p>
+      <button class="act" data-act="deal-go">HAND TO ${esc(who.name).toUpperCase()}</button></div>`;
+  }
+  const need=Math.min(nK,d.drawn.length), got=UI.pick.size;
+  return `<div class="pane">
+    <div class="rowbet"><span class="eyebrow">Your cards, ${esc(who.name)}</span>
+      <span class="meta" style="${got===need?'color:var(--gold-hi)':''}">${got} / ${need} KEPT</span></div>
+    <p>Tap a card or its lot on the board. Chosen lots glow gold — check what they sit next to before you commit.</p>
+    <div class="cards">${d.drawn.map(id=>`<button class="deed ${UI.pick.has(id)?'on':''}" data-act="pick" data-i="${id}">
+      <b>${id}</b><span>${LOT[id].st.toUpperCase()}</span></button>`).join('')}</div>
+    <button class="act" data-act="keep" ${got===need?'':'disabled'}>CLAIM ${need} LOT${need===1?'':'S'}</button>
+    ${UI.me!=null?'<button class="act quiet slim" data-act="hide-me">HIDE MY CASH</button>':''}</div>`;
+}
+
+function paneTiles(){
+  const [,n]=DEAL[S.players.length][S.round-1];
+  return `<div class="pane"><span class="eyebrow">Out of the bag</span>
+    <p style="margin-top:9px">${n} tiles each, drawn blind and turned over together. ${S.bag.length} tiles left in the bag.</p>
+    <button class="act" data-act="draw-tiles">DRAW FOR EVERYONE</button></div>`;
+}
+
+function paneTrade(){
+  return `<div class="pane"><span class="eyebrow">On the table</span>
+    <p style="margin-top:9px">Talk it out. When a deal lands, record it so the board and the cash stay honest.</p>
+    <button class="act" data-act="trade">RECORD A DEAL</button>
+    <button class="act quiet" data-act="end-trade">EVERYONE'S DONE — BUILD</button></div>`
+  + `<div class="pane"><span class="eyebrow">Tiles in hand</span>`
+  + S.players.map(p=>`<div style="margin-top:12px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="disc" style="width:16px;height:16px;background:${hex(p.id)}"></span>
+        <b style="font:700 13px/1 var(--sans)">${esc(p.name)}</b>
+        <span class="meta" style="margin-left:auto">${ownedBy(p.id).length} LOTS</span></div>
+      ${p.tiles.length? '<div class="rack">'+p.tiles.map(k=>tileHTML(k)).join('')+'</div>' : '<div class="none">Nothing in hand.</div>'}
+    </div>`).join('') + '</div>';
+}
+
+function tileHTML(k,idx,live){
+  const s=SHOP[k];
+  return `<div class="tile ${live&&UI.selTile===idx?'on':''}" style="background:${s.bg};color:${s.fg}"
+    ${live?`data-act="pick-tile" data-i="${idx}"`:''}><em>${s.g}</em><b>${s.n.toUpperCase()}</b><i>MAX ${s.max}</i></div>`;
+}
+
+function paneBuild(){
+  const p=cur(), vac=vacantOwnedBy(p.id).length;
+  return `<div class="pane">
+    <div class="rowbet"><span class="eyebrow">Building</span><span class="meta">${vac} EMPTY LOTS</span></div>
+    <h2 style="margin-top:8px">${esc(p.name).toUpperCase()}</h2>
+    <p>${UI.selTile!=null?'Now tap one of the dashed lots on the board.':'Pick a tile, then tap one of your empty lots. Build as many as you like, or none at all.'}</p>
+    ${p.tiles.length? '<div class="rack">'+p.tiles.map((k,i)=>tileHTML(k,i,true)).join('')+'</div>' : '<div class="none">No tiles left to build.</div>'}
+    <button class="act" data-act="end-build">${esc(p.name).toUpperCase()} IS DONE</button></div>`;
+}
+
+function paneIncome(){
+  return `<div class="pane"><span class="eyebrow">Rents for ${YEARS[S.round-1].y}</span>
+    <table class="led" style="margin-top:10px"><tbody>${S.players.map(p=>{
+      const b=businesses(p.id);
+      return `<tr><td><span class="disc" style="display:inline-block;width:12px;height:12px;vertical-align:-1px;background:${hex(p.id)}"></span> ${esc(p.name)}</td>
+        <td class="n">${b.length} biz</td><td class="g">${money(b.reduce((a,x)=>a+x.pay,0))}</td></tr>`;}).join('')}</tbody></table>
+    <button class="act quiet slim" data-act="income-detail">SHOW THE BREAKDOWN</button>
+    <button class="act" data-act="pay">${S.round<6?'PAY OUT · START '+YEARS[S.round].y:'PAY OUT · CLOSE THE BOOKS'}</button></div>`;
+}
+
+function paneOver(){
+  const r=[...S.players].sort((a,b)=>b.money-a.money||tilesOnBoard(b.id)-tilesOnBoard(a.id));
+  return `<div class="pane"><span class="eyebrow">Final standings</span>
+    ${r.map((p,i)=>`<div class="rank ${i===0?'top':''}"><span class="pos">${i+1}</span>
+      <span class="disc" style="background:${hex(p.id)}"></span>
+      <span class="who"><b style="font:700 14px/1.2 var(--sans)">${esc(p.name)}</b></span>
+      <span class="amt">${money(p.money)}</span></div>`).join('')}
+    <button class="act quiet" data-act="restart">START A NEW GAME</button></div>`;
+}
+
+function groupAt(id){
+  const st=S.plots[id]; if(!st.shop) return null;
+  const seen=new Set([id]), q=[id]; let n=0;
+  while(q.length){ const a=q.pop(); n++;
+    for(const b of NEIGH[a]){ const nb=S.plots[b];
+      if(!seen.has(b)&&nb.shop===st.shop&&nb.owner===st.owner){ seen.add(b); q.push(b); } } }
+  return {n, max:SHOP[st.shop].max};
+}
+
+function lotPane(){
+  if(UI.sel==null) return '';
+  const id=UI.sel, st=S.plots[id], g=groupAt(id), s=st.shop?SHOP[st.shop]:null;
+  return `<div class="pane"><span class="eyebrow">Selected lot</span>
+    <h2 style="margin-top:9px">${addr(id).toUpperCase()}</h2>
+    <div style="margin-top:11px;display:flex;align-items:center;gap:11px">
+      <span style="display:flex;align-items:center;justify-content:center;width:46px;height:36px;border-radius:3px;flex:none;font-size:21px;
+        background:${s?s.bg:'#2a3546'};color:${s?s.fg:'#7d8593'};box-shadow:inset 0 0 0 1px rgba(0,0,0,.25)">${s?s.g:'—'}</span>
+      <span style="min-width:0"><b style="display:block;font:700 14px/1.2 var(--sans);letter-spacing:.06em">${s?s.n.toUpperCase():'VACANT LOT'}</b>
+        <span style="display:block;margin-top:3px" class="meta">${s?('BUSINESS OF '+g.n+' · MAX '+g.max):'NO SIGN UP'}</span></span></div>
+    <div style="margin-top:13px;display:flex;flex-direction:column;gap:9px">
+      <div class="rowbet"><span class="meta">OWNER</span>
+        <span style="display:flex;align-items:center;gap:7px">
+          <span style="width:12px;height:12px;border-radius:50%;background:${st.owner!==null?hex(st.owner):'#39414f'}"></span>
+          <b style="font:700 13px/1 var(--sans)">${st.owner!==null?esc(pl(st.owner).name):'UNCLAIMED'}</b></span></div>
+      <div class="rowbet"><span class="meta">PAYS THIS YEAR</span>
+        <span class="mono" style="font-weight:700;color:var(--gold-hi)">${s?money(g.n>=g.max?PAY_FULL[g.max]:PAY_PART[Math.min(g.n,5)]):'—'}</span></div>
+      <div class="rowbet"><span class="meta">NEIGHBOURS</span><span class="mono">${NEIGH[id].join(' · ')||'none'}</span></div>
+    </div>
+    <button class="act quiet slim" data-act="unsel">CLEAR SELECTION</button></div>`;
+}
+/* ================================================================ sheets === */
+function openSheet(t,d){ UI.sheet={t,d}; renderSheet(); }
+function closeSheet(){ UI.sheet=null; UI.gateCb=null; renderSheet(); }
+function gate(p,say,cb){ UI.gateCb=cb; openSheet('gate',{p,say}); }
+function toast(m){
+  const o=document.querySelector('.toast'); if(o) o.remove();
+  const t=document.createElement('div'); t.className='toast'; t.textContent=m;
+  document.body.appendChild(t); setTimeout(()=>t.remove(),2200);
+}
+function renderSheet(){
+  const o=document.getElementById('veil'); if(o) o.remove();
+  if(!UI.sheet) return;
+  const v=document.createElement('div');
+  v.id='veil'; v.className='veil'+(UI.sheet.t==='gate'?'':' soft');
+  v.innerHTML=SHEETS[UI.sheet.t](UI.sheet.d);
+  document.body.appendChild(v);
+}
+const wrap=(title,body,x=true)=>`<div class="sheet"><header><h3>${title}</h3>
+  ${x?'<button class="xb" data-act="close">✕</button>':''}</header><div class="in">${body}</div></div>`;
+
+const SHEETS={
+
+gate:d=>{
+  const y=YEARS[Math.min(S.round,6)-1], ph=PHASE_COPY[S.phase]||{t:'ACCOUNTS'};
+  return `<div class="pass">
+    <div class="lead">PASS THE SCREEN TO</div>
+    <div class="name"><span style="background:${hex(d.p)}"></span><b>${esc(pl(d.p).name)}</b></div>
+    <div class="strip"><span>${y.y}</span><s></s><span>YEAR OF THE ${y.z}</span><s></s><span>${ph.t}</span></div>
+    <div class="say">${esc(d.say)}</div>
+    <button class="go" data-act="gate-ok">I'M ${esc(pl(d.p).name).toUpperCase()} — CONTINUE</button>
+    <div><button class="no" data-act="close">NOT ME — GO BACK</button></div>
+  </div>`;
+},
+
+whoami:()=>wrap('Whose cash?',
+  `<p style="margin:0 0 14px;font:400 13px/1.45 var(--sans);color:#a8b0bc">Cash is secret. Confirm it's you and your balance shows in the top bar until you hide it.</p>`
+  + S.players.map(p=>`<button class="seat" style="margin-bottom:8px" data-act="peek" data-i="${p.id}">
+      <span class="disc" style="background:${hex(p.id)}"></span>
+      <span class="who"><b>${esc(p.name)}</b><span>${ownedBy(p.id).length} LOTS · ${tilesOnBoard(p.id)} SHOPS</span></span>
+      <span class="cash hid">••••••</span></button>`).join('')),
+
+log:()=>wrap('Game log','<div class="logl">'+S.log.map(l=>`<div class="${l.k==='yy'?'yy':''}">${esc(l.t)}</div>`).join('')+'</div>'),
+
+income:()=>{
+  let h='';
+  for(const p of S.players){
+    const b=businesses(p.id);
+    h+=`<div class="lbl" style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--gold-dim)">
+      <span style="width:11px;height:11px;border-radius:50%;background:${hex(p.id)}"></span>${esc(p.name).toUpperCase()}</div>`;
+    h+= b.length? '<table class="led"><tbody>'+b.map(x=>{const s=SHOP[x.shop];
+        return `<tr><td>${s.g} ${s.n}</td><td class="n">${x.size} of ${s.max}</td>
+          <td>${x.complete?'<span style="color:var(--gold-hi)">complete</span>':'growing'}</td>
+          <td class="g">${money(x.pay)}</td></tr>`;}).join('')
+      +`<tr><td colspan="3" style="text-align:right;color:var(--muted)">Total</td><td class="g">${money(b.reduce((a,x)=>a+x.pay,0))}</td></tr></tbody></table>`
+      : '<div class="none">Nothing trading yet.</div>';
+  }
+  return wrap('Income breakdown',h);
+},
+
+end:()=>{
+  const r=[...S.players].sort((a,b)=>b.money-a.money||tilesOnBoard(b.id)-tilesOnBoard(a.id));
+  return wrap('1970 · year of the dog',
+    r.map((p,i)=>`<div class="rank ${i===0?'top':''}"><span class="pos">${i+1}</span>
+      <span class="disc" style="background:${hex(p.id)}"></span>
+      <span class="who"><b style="font:700 15px/1.2 var(--sans)">${esc(p.name)}</b>
+        <span class="meta">${tilesOnBoard(p.id)} SHOPS ON THE BOARD</span></span>
+      <span class="amt">${money(p.money)}</span></div>`).join('')
+    +`<p style="margin-top:16px;font:400 14px/1.5 var(--sans);color:#a8b0bc">${esc(r[0].name)} finishes richest and takes Chinatown.</p>
+      <button class="act quiet" data-act="close">LOOK OVER THE BOARD</button>`);
+},
+
+rules:()=>wrap('How a year runs',`
+  <ol style="margin:0;padding-left:18px;font:400 13.5px/1.8 var(--sans);color:#b6bdc8">
+    <li><b>Deal buildings.</b> Take a handful of cards, keep a set number, stake those lots.</li>
+    <li><b>Draw tiles.</b> Blind from the bag, revealed together.</li>
+    <li><b>Negotiate.</b> Lots, built shops, loose tiles, cash, favours — anything goes.</li>
+    <li><b>Build.</b> In turn order, place tiles on your own empty lots. They never move again.</li>
+    <li><b>Settle rents.</b> Six years, then the richest player wins.</li>
+  </ol>
+  <div class="lbl">What counts as one business</div>
+  <p style="margin:0;font:400 13px/1.5 var(--sans);color:#a8b0bc">Same shop type, same owner, touching side by side inside one block. Streets and landmarks break the chain. A group bigger than the shop's maximum splits into a complete business plus the leftovers.</p>
+  <div class="lbl">Payouts</div>
+  <table class="led"><thead><tr><th>Tiles</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr></thead><tbody>
+    <tr><td>Growing</td><td class="n">10k</td><td class="n">20k</td><td class="n">40k</td><td class="n">60k</td><td class="n">80k</td><td class="n">—</td></tr>
+    <tr><td>Complete</td><td class="n">—</td><td class="n">—</td><td class="g">50k</td><td class="g">80k</td><td class="g">110k</td><td class="g">140k</td></tr>
+  </tbody></table>
+  <div class="lbl">The twelve shops</div>
+  <div class="rack">${SHOPS.map(s=>`<div class="tile" style="background:${s.bg};color:${s.fg}">
+    <em>${s.g}</em><b>${s.n.toUpperCase()}</b><i>MAX ${s.max}</i></div>`).join('')}</div>`),
+
+menu:()=>wrap('Table settings',`
+  <div class="lbl">First player card</div>
+  <div class="pills">${S.players.map(p=>`<button class="pill ${S.first===p.id?'on':''}" data-act="set-first" data-i="${p.id}">
+    <span class="cd" style="background:${hex(p.id)}"></span>${esc(p.name)}</button>`).join('')}</div>
+  <div class="lbl">Cash correction</div>
+  <div class="pills">${S.players.map(p=>`<button class="pill ${UI.fix===p.id?'on':''}" data-act="fix-who" data-i="${p.id}">
+    <span class="cd" style="background:${hex(p.id)}"></span>${esc(p.name)}</button>`).join('')}</div>
+  ${UI.fix!=null?`<div class="pills" style="margin-top:8px">
+    ${[10000,50000,100000,-10000,-50000,-100000].map(v=>
+      `<button class="pill" data-act="fix" data-v="${v}">${v>0?'+':''}${money(v)}</button>`).join('')}</div>`:''}
+  <div class="lbl">Start over</div>
+  <button class="act quiet slim" data-act="restart">ABANDON THIS GAME</button>`),
+
+trade:()=>{
+  const t=UI.trade;
+  const side=(who,other,tag)=>`<div class="side">
+    <div style="display:flex;align-items:center;gap:8px">
+      <span class="disc" style="width:18px;height:18px;background:${hex(who)}"></span>
+      <select data-act="t-who" data-tag="${tag}">${S.players.map(q=>
+        `<option value="${q.id}" ${q.id===who?'selected':''} ${q.id===other?'disabled':''}>${esc(q.name)}</option>`).join('')}</select>
+    </div>
+    <div class="lbl">Cash handed over</div>
+    <div class="big">${money(t[tag+'Money'])}</div>
+    <div class="pills">${[10000,50000,100000].map(v=>`<button class="pill" data-act="t-money" data-tag="${tag}" data-v="${v}">+${v/1000}k</button>`).join('')}
+      <button class="pill" data-act="t-money" data-tag="${tag}" data-v="0">clear</button></div>
+    <div class="lbl">Loose tiles</div>
+    <div class="pills">${pl(who).tiles.length? pl(who).tiles.map((k,i)=>
+      `<button class="pill ${t[tag+'Tiles'].includes(i)?'on':''}" data-act="t-tile" data-tag="${tag}" data-i="${i}">${SHOP[k].g} ${SHOP[k].n}</button>`).join('')
+      : '<span class="none">none</span>'}</div>
+    <div class="lbl">Lots · a built shop travels with its lot</div>
+    <div class="pills" style="max-height:160px;overflow:auto">${ownedBy(who).length? ownedBy(who).map(id=>
+      `<button class="pill ${t[tag+'Lots'].includes(id)?'on':''}" data-act="t-lot" data-tag="${tag}" data-i="${id}">${id}${S.plots[id].shop?' '+SHOP[S.plots[id].shop].g:''}</button>`).join('')
+      : '<span class="none">none</span>'}</div></div>`;
+  return wrap('Record a deal',
+    `<div class="two">${side(t.a,t.b,'a')}${side(t.b,t.a,'b')}</div>
+     <p style="margin:14px 0 0;font:400 13px/1.45 var(--sans);color:#a8b0bc">Everything picked on the left goes to the player on the right, and the other way round.</p>
+     <button class="act" data-act="t-do">SWAP IT OVER</button>`);
+}
+};
+
+function newTrade(){
+  UI.trade={a:0,b:1,aMoney:0,bMoney:0,aTiles:[],bTiles:[],aLots:[],bLots:[]};
+  openSheet('trade');
+}
+function doTrade(){
+  const t=UI.trade, A=pl(t.a), B=pl(t.b);
+  if(t.a===t.b) return toast('Pick two different players');
+  if(A.money<t.aMoney) return toast(A.name+' is short on cash');
+  if(B.money<t.bMoney) return toast(B.name+' is short on cash');
+  if(markersLeft(t.b) < t.aLots.length-t.bLots.length) return toast(B.name+' is out of markers');
+  if(markersLeft(t.a) < t.bLots.length-t.aLots.length) return toast(A.name+' is out of markers');
+  snapshot();
+  A.money+=t.bMoney-t.aMoney; B.money+=t.aMoney-t.bMoney;
+  const ag=t.aTiles.map(i=>A.tiles[i]), bg=t.bTiles.map(i=>B.tiles[i]);
+  A.tiles=A.tiles.filter((_,i)=>!t.aTiles.includes(i)).concat(bg);
+  B.tiles=B.tiles.filter((_,i)=>!t.bTiles.includes(i)).concat(ag);
+  for(const id of t.aLots) S.plots[id].owner=t.b;
+  for(const id of t.bLots) S.plots[id].owner=t.a;
+  const say=(n,m,ti,lo)=>{const b=[]; if(m)b.push(money(m));
+    if(ti.length)b.push(ti.map(k=>SHOP[k].n).join(', '));
+    if(lo.length)b.push('lot'+(lo.length>1?'s':'')+' '+lo.join(', '));
+    return n+' gave '+(b.length?b.join(' + '):'nothing');};
+  log('','Deal — '+say(A.name,t.aMoney,ag,t.aLots)+'; '+say(B.name,t.bMoney,bg,t.bLots)+'.');
+  closeSheet(); save(); render(); toast('Deal recorded');
+}
+
+/* ================================================================= setup === */
+function renderSetup(){
+  const n=UI.count||4, names=UI.names||['','','','',''];
+  app.innerHTML=`<header class="topbar">
+      <div class="mark"><b>CHINATOWN</b><span>PROPERTY NEGOTIATION · SIX YEARS</span></div>
+      <div class="years"></div>
+      <div class="tools"><button class="tool" data-act="rules">RULES</button></div></header>
+    <div class="stage" style="overflow:auto"><div style="max-width:560px;margin:0 auto;padding:26px 18px;width:100%">
+      <span class="eyebrow">New table</span>
+      <h2 style="margin:10px 0 8px;font:700 clamp(26px,5vw,38px)/1.05 var(--sans)">Who's playing?</h2>
+      <p style="margin:0 0 20px;font:400 14px/1.5 var(--sans);color:#a8b0bc">One screen, passed around the table. Three to five players, six years, every lot in the neighbourhood up for grabs.</p>
+      <div class="pills">${[3,4,5].map(v=>`<button class="pill ${n===v?'on':''}" data-act="count" data-v="${v}">${v} PLAYERS</button>`).join('')}</div>
+      <div class="lbl">Names</div>
+      ${Array.from({length:n},(_,i)=>`<div style="display:flex;gap:10px;align-items:center;margin-bottom:9px">
+        <span class="disc" style="background:${COLORS[i].hex}"></span>
+        <input type="text" id="nm${i}" maxlength="14" placeholder="${COLORS[i].n}" value="${esc(names[i]||'')}">
+      </div>`).join('')}
+      <button class="act" data-act="start">DEAL THE FIRST YEAR</button>
+    </div></div>`;
+  renderSheet();
+}
+function grabNames(){
+  UI.names=UI.names||['','','','',''];
+  for(let i=0;i<(UI.count||4);i++){ const e=document.getElementById('nm'+i); if(e) UI.names[i]=e.value; }
+}
+function startGame(){
+  const n=UI.count||4;
+  const names=Array.from({length:n},(_,i)=>((UI.names&&UI.names[i])||'').trim()||COLORS[i].n);
+  HISTORY=[]; newGame(names,COLORS.slice(0,n).map(c=>c.k)); save(); render();
+}
+
+/* ================================================================= input === */
+function lotTap(id){
+  if(S.phase==='deal' && S.deal.drawn && S.deal.drawn.includes(id)){
+    const [,nK]=DEAL[S.players.length][S.round-1], need=Math.min(nK,S.deal.drawn.length);
+    if(UI.pick.has(id)) UI.pick.delete(id);
+    else { if(UI.pick.size>=need) UI.pick.delete([...UI.pick][0]); UI.pick.add(id); }
+    return render();
+  }
+  if(S.phase==='build' && UI.selTile!=null && S.plots[id].owner===S.turn && !S.plots[id].shop) return placeTile(id);
+  UI.sel = UI.sel===id? null : id; render();
+}
+
+document.addEventListener('click',e=>{
+  const lotEl=e.target.closest('[data-lot]');
+  if(lotEl && S) return lotTap(+lotEl.dataset.lot);
+  const el=e.target.closest('[data-act]'); if(!el) return;
+  const a=el.dataset.act,
+        i=el.dataset.i!==undefined?+el.dataset.i:null,
+        v=el.dataset.v!==undefined?+el.dataset.v:null,
+        k=el.dataset.k, tag=el.dataset.tag;
+
+  // trade sub-controls
+  if(a==='t-money'){ UI.trade[tag+'Money']= v===0?0:UI.trade[tag+'Money']+v; return renderSheet(); }
+  if(a==='t-tile'||a==='t-lot'){
+    const key=tag+(a==='t-tile'?'Tiles':'Lots'), arr=UI.trade[key], at=arr.indexOf(i);
+    at>=0?arr.splice(at,1):arr.push(i); return renderSheet();
+  }
+
+  switch(a){
+    case 'close': closeSheet(); break;
+    case 'gate-ok': { const cb=UI.gateCb; UI.gateCb=null; UI.sheet=null; if(cb) cb(); render(); break; }
+    case 'undo': closeSheet(); undo(); break;
+    case 'log': openSheet('log'); break;
+    case 'rules': openSheet('rules'); break;
+    case 'menu': openSheet('menu'); break;
+    case 'whoami': openSheet('whoami'); break;
+    case 'hide-me': UI.me=null; render(); break;
+    case 'peek':
+      if(UI.me===i){ UI.me=null; closeSheet(); render(); }
+      else gate(i,'Your balance is about to show in the top bar.',()=>{ UI.me=i; });
+      break;
+    case 'filter': UI.filter = UI.filter===k? null : k; render(); break;
+    case 'unsel': UI.sel=null; render(); break;
+    case 'set-first':
+      if(S.phase==='deal' && S.deal.i>0){ toast('Too late — cards are already out'); break; }
+      snapshot(); S.first=i; if(S.phase==='deal') startDeal();
+      log('', pl(i).name+' now holds the first player card.'); closeSheet(); save(); render(); break;
+    case 'fix-who': UI.fix = UI.fix===i? null : i; renderSheet(); break;
+    case 'fix': snapshot(); pl(UI.fix).money+=v;
+      log('', pl(UI.fix).name+' cash corrected by '+money(v)+'.'); save(); renderSheet(); render(); break;
+
+    case 'trade': newTrade(); break;
+    case 't-do': doTrade(); break;
+    case 'income-detail': openSheet('income'); break;
+    case 'deal-go': dealGo(); break;
+    case 'pick': lotTap(i); break;
+    case 'keep': confirmKeep(); break;
+    case 'draw-tiles': drawTiles(); break;
+    case 'end-trade': endTrade(); break;
+    case 'pick-tile': UI.selTile = UI.selTile===i? null : i; render(); break;
+    case 'end-build': endBuild(); break;
+    case 'pay': payout(); break;
+
+    case 'count': grabNames(); UI.count=v; renderSetup(); break;
+    case 'start': grabNames(); startGame(); break;
+    case 'restart':
+      if(!UI.wipe){ UI.wipe=true; el.textContent='TAP AGAIN TO WIPE THE BOARD'; break; }
+      store.del(); S=null; HISTORY=[]; UI={count:4,names:['','','','','']}; renderSetup(); break;
+  }
+});
+
+document.addEventListener('change',e=>{
+  const el=e.target.closest('[data-act="t-who"]'); if(!el||!UI.trade) return;
+  const tag=el.dataset.tag, val=+el.value;
+  if(UI.trade[tag==='a'?'b':'a']===val) return renderSheet();
+  UI.trade[tag]=val; UI.trade[tag+'Tiles']=[]; UI.trade[tag+'Lots']=[]; UI.trade[tag+'Money']=0;
+  renderSheet();
+});
+
+/* ================================================================== boot === */
+(async function(){
+  UI={count:4,names:['','','','','']};
+  const saved=await store.get();
+  if(saved && saved.players && saved.phase!=='over'){ S=saved; render(); toast('Picked up where you left off'); }
+  else renderSetup();
+})();
+</script>
+</body>
+</html>
