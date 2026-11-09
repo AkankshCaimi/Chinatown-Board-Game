@@ -95,39 +95,7 @@ input,select{font:inherit}
 }
 .stname.v span{writing-mode:vertical-rl;text-orientation:mixed}
 
-/* the calendar dial standing in the empty plaza */
-.wheel{position:absolute;pointer-events:none}
-.wheel .dial{
-  position:absolute;left:8%;top:8%;width:84%;height:84%;border-radius:50%;
-  background:radial-gradient(circle at 50% 35%, rgba(28,37,53,.94), rgba(10,16,26,.96));
-  box-shadow:0 0 0 2px rgba(224,184,106,.5), 0 10px 26px rgba(0,0,0,.55),
-             inset 0 0 30px rgba(0,0,0,.6)
-}
-.wheel .tick{
-  position:absolute;transform:translate(-50%,-50%);width:23%;height:23%;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  background:rgba(12,19,30,.9);box-shadow:inset 0 0 0 1px rgba(224,184,106,.28)
-}
-.wheel .tick b{font:700 clamp(6px,.72vw,11px)/1 var(--mono);color:var(--muted)}
-.wheel .tick.past{background:rgba(20,28,42,.9)}
-.wheel .tick.past b{color:#4d545e}
-.wheel .tick.now{background:var(--gold);box-shadow:0 0 14px rgba(239,196,105,.6)}
-.wheel .tick.now b{color:#2a1c02}
-/* the marker that walks round the years */
-.wheel .pawn{
-  position:absolute;transform:translate(-50%,-50%);width:11%;height:11%;border-radius:50%;
-  background:radial-gradient(circle at 40% 32%, #fdf7e6, var(--paper) 60%, #b8a980);
-  box-shadow:0 0 0 2px #2a1c02, 0 4px 10px rgba(0,0,0,.7), 0 0 16px rgba(239,196,105,.5);
-  transition:left .6s cubic-bezier(.4,1.4,.5,1), top .6s cubic-bezier(.4,1.4,.5,1)
-}
-.wheel .hub{
-  position:absolute;left:24%;top:38%;width:52%;height:24%;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;text-align:center
-}
-.wheel .hub b{font:700 clamp(9px,1.35vw,20px)/1 var(--sans);color:var(--gold-hi)}
-.wheel .hub span{font:700 clamp(5px,.6vw,8px)/1 var(--mono);letter-spacing:.14em;color:var(--muted)}
-.wheel .hub i{font:700 clamp(5px,.55vw,8px)/1 var(--mono);font-style:normal;letter-spacing:.1em;color:var(--gold-deep)}
-@media (prefers-reduced-motion:reduce){ .wheel .pawn{transition:none} }
+/* the blocks, their lots, and the buildings that were never for sale */
 .blk{position:absolute;display:grid;gap:clamp(1.5px,.28vw,4px);padding:0}
 .bldg{border-radius:2px;background:rgba(10,16,26,.4)}
 .lot{
@@ -159,6 +127,50 @@ input,select{font:inherit}
 .lot.chosen .ln{color:rgba(30,20,0,.8)}
 .lot.free{background:rgba(239,196,105,.5);box-shadow:inset 0 0 0 2px var(--gold)}
 .lot.mute{opacity:.25}
+@media (prefers-reduced-motion:no-preference){
+  .lot.offer{animation:blip 1.8s ease-in-out infinite}
+  @keyframes blip{0%,100%{box-shadow:inset 0 0 0 2px var(--gold-deep)}
+                  50%{box-shadow:inset 0 0 0 3px var(--gold),0 0 12px rgba(239,196,105,.6)}}
+}
+
+/* the brass calendar plate standing in the empty plaza */
+.plate{position:absolute;pointer-events:none;display:flex;align-items:center;justify-content:center}
+.plate .face{
+  width:100%;height:100%;border-radius:4px;padding:6% 7%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5%;
+  background:linear-gradient(150deg,#2a3446 0%,#141d2b 45%,#1d2634 100%);
+  box-shadow:0 0 0 1px rgba(239,196,105,.55), 0 0 0 4px rgba(10,16,26,.55),
+             0 10px 26px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.07)
+}
+.plate .crest{
+  font:700 clamp(5px,.58vw,9px)/1 var(--sans);letter-spacing:.3em;color:var(--gold-deep);flex:none
+}
+.plate .bigyear{
+  font:700 clamp(15px,2.3vw,34px)/1 var(--sans);letter-spacing:.02em;color:var(--gold-hi);
+  text-shadow:0 1px 0 rgba(0,0,0,.6);flex:none;margin-top:2%
+}
+.plate .zod{
+  font:700 clamp(5px,.58vw,9px)/1 var(--mono);letter-spacing:.18em;color:var(--muted);flex:none;margin-top:2%
+}
+.plate .years{
+  display:grid;grid-template-columns:repeat(6,1fr);gap:2.5%;
+  width:100%;height:18%;margin-top:4%;flex:none
+}
+.plate .years span{
+  display:flex;align-items:center;justify-content:center;border-radius:2px;
+  font:700 clamp(5px,.62vw,10px)/1 var(--mono);
+  background:rgba(8,13,21,.6);color:#5d6470;box-shadow:inset 0 0 0 1px rgba(224,184,106,.12)
+}
+.plate .years span.past{color:#7a6a44;background:rgba(122,106,68,.14)}
+.plate .years span.now{
+  background:var(--gold);color:#2a1c02;box-shadow:0 0 10px rgba(239,196,105,.55)
+}
+.plate .rule2{width:55%;height:1px;background:rgba(239,196,105,.25);margin-top:5%;flex:none}
+.plate .foot2{
+  font:700 clamp(5px,.55vw,9px)/1 var(--mono);letter-spacing:.14em;color:var(--gold-deep);
+  text-align:center;padding:0 4%;margin-top:4%;flex:none
+}
+
 /* named in an open offer: spoken for until somebody answers */
 .lot.locked{box-shadow:inset 0 0 0 2px #d98a6a, 0 0 8px rgba(217,138,106,.5);z-index:2}
 .lot.locked::after{
@@ -166,6 +178,30 @@ input,select{font:inherit}
   background:#d98a6a;box-shadow:0 0 0 1.5px rgba(0,0,0,.4)
 }
 
+/* an offer on the table */
+.offer{
+  margin-top:10px;border-radius:8px;padding:12px;background:var(--panel);
+  box-shadow:inset 0 0 0 1px rgba(224,184,106,.2)
+}
+.offer.tome{box-shadow:inset 0 0 0 1px var(--gold);background:rgba(239,196,105,.07)}
+.offer .who{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+.offer .who .disc{width:16px;height:16px}
+.offer .who b{font:700 13.5px/1 var(--sans)}
+.offer .who .arrow{color:var(--muted);font:700 14px/1 var(--sans)}
+.offer .terms{display:flex;gap:10px;margin-top:10px}
+.offer .terms span{
+  flex:1;min-width:0;background:var(--panel3);border-radius:5px;padding:7px 8px;
+  font:400 12.5px/1.35 var(--sans);color:var(--text);word-break:break-word
+}
+.offer .terms i{
+  display:block;font:700 8.5px/1 var(--mono);letter-spacing:.12em;color:var(--muted);
+  font-style:normal;margin-bottom:4px;text-transform:uppercase
+}
+.offerbtns{display:flex;gap:6px;margin-top:10px}
+.offerbtns .act{margin-top:0;flex:1}
+@media (max-width:520px){ .offer .terms{flex-direction:column;gap:6px} }
+
+/* who the table is waiting on */
 .waitlist{margin-top:12px;display:flex;flex-direction:column;gap:1px}
 .waitrow{
   display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:5px;
@@ -175,40 +211,50 @@ input,select{font:inherit}
 .waitrow.done{background:rgba(46,177,132,.12)}
 .waitrow.done .meta{color:var(--jade)}
 
-.offer{
-  margin-top:10px;border-radius:8px;padding:12px;background:var(--panel);
-  box-shadow:inset 0 0 0 1px rgba(224,184,106,.2)
+/* counts on the tile pills in the offer composer */
+.pill .cnt{
+  margin-left:5px;font:700 9px/1 var(--mono);letter-spacing:.06em;opacity:.65;
+  padding:2px 4px;border-radius:3px;background:rgba(0,0,0,.25)
 }
-.offer.tome{box-shadow:inset 0 0 0 1px var(--gold);background:rgba(239,196,105,.07)}
-.offer .who{display:flex;align-items:center;gap:7px}
-.offer .who .disc{width:16px;height:16px}
-.offer .who b{font:700 13.5px/1 var(--sans)}
-.offer .who .arrow{color:var(--muted);font:700 14px/1 var(--sans)}
-.offer .terms{display:flex;gap:10px;margin-top:10px}
-.offer .terms span{
-  flex:1;min-width:0;background:var(--panel3);border-radius:5px;padding:7px 8px;
-  font:400 12.5px/1.35 var(--sans);color:var(--text)
+.pill.on .cnt{background:rgba(0,0,0,.18);opacity:.85}
+
+/* the rules sheet, stacked so it fits a phone */
+.ruleslist{margin:0;padding-left:20px;font:400 14px/1.7 var(--sans);color:#b6bdc8}
+.ruleslist li{margin-bottom:10px}
+.ruleslist b{color:var(--text)}
+.rulesp{margin:0;font:400 13.5px/1.6 var(--sans);color:#a8b0bc}
+.paylist,.shoplist{display:flex;flex-direction:column;gap:3px}
+.payrow{
+  display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:5px;
+  background:var(--panel);font:400 13px/1 var(--sans)
 }
-.offer .terms i{
-  display:block;font:700 8.5px/1 var(--mono);letter-spacing:.12em;color:var(--muted);
-  font-style:normal;margin-bottom:4px;text-transform:uppercase
+.payrow .n{
+  width:24px;height:24px;flex:none;border-radius:4px;display:flex;align-items:center;justify-content:center;
+  font:700 12px/1 var(--mono);background:var(--panel3);color:var(--muted)
 }
-.diagrow{display:flex;gap:10px;align-items:flex-start;padding:11px 0;box-shadow:inset 0 -1px 0 var(--hair)}
-.diagrow .mark{font:700 15px/1.3 var(--sans);width:18px;flex:none}
-.diagrow.ok .mark{color:var(--jade)}
-.diagrow.bad .mark{color:var(--danger)}
-.diagrow b{display:block;font:700 13.5px/1.3 var(--sans)}
-.diagrow span span{display:block;margin-top:4px;font:400 12.5px/1.45 var(--sans);color:#a8b0bc;word-break:break-word}
-.diagrow.bad b{color:var(--danger)}
-.offerbtns{display:flex;gap:6px;margin-top:10px}
-.offerbtns .act{margin-top:0;flex:1}
-@media (prefers-reduced-motion:no-preference){
-  .lot.offer{animation:blip 1.8s ease-in-out infinite}
-  @keyframes blip{0%,100%{box-shadow:inset 0 0 0 2px var(--gold-deep)}
-                  50%{box-shadow:inset 0 0 0 3px var(--gold),0 0 12px rgba(239,196,105,.6)}}
+.payrow .w{flex:1;color:#a8b0bc}
+.payrow .v{font:700 13px/1 var(--mono);color:var(--text)}
+.payrow.full{background:rgba(239,196,105,.09)}
+.payrow.full .n{background:rgba(239,196,105,.2);color:var(--gold-hi)}
+.payrow.full .w{color:var(--gold-dim)}
+.payrow.full .v{color:var(--gold-hi)}
+.shoprow{
+  display:flex;align-items:center;gap:10px;padding:7px 11px;border-radius:5px;
+  background:var(--panel);font:400 13.5px/1 var(--sans)
+}
+.shoprow .sign{
+  width:30px;height:26px;flex:none;border-radius:3px;display:flex;align-items:center;
+  justify-content:center;background:var(--bg);box-shadow:inset 0 0 0 1px rgba(0,0,0,.25)
+}
+.shoprow .sign em{font-style:normal;font-size:16px;line-height:1}
+.shoprow b{flex:1;font-weight:700}
+@media (max-width:520px){
+  .sheet .in{padding:14px}
+  .ruleslist{padding-left:17px;font-size:13.5px}
+  .shoprow{font-size:12.5px;padding:6px 9px}
+  .shoprow .sign{width:26px;height:23px}
 }
 
-/* ------------------------------------------------------------- legend --- */
 .legend{flex:none;border-radius:8px;background:var(--panel2);box-shadow:inset 0 0 0 1px var(--hair);padding:10px 12px 12px}
 .legend .hd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:9px;flex-wrap:wrap}
 .chips{display:flex;gap:6px}
@@ -480,7 +526,7 @@ select,input[type=text]{width:100%;padding:10px;border-radius:6px;background:var
   .mark b{font-size:17px}
   .topbar{flex-wrap:wrap}
   .years{order:3;width:100%;flex:1 0 100%;box-shadow:inset 0 1px 0 var(--hair)}
-  .tools{margin-left:auto;padding:8px 12px;gap:5px;overflow-x:auto;max-width:100%}
+  .tools{margin-left:auto;padding:8px 12px;gap:5px;flex-wrap:wrap;justify-content:flex-end;max-width:100%}
   .tool{height:34px;padding:0 9px;font-size:10px}
 }
 @media (max-width:720px){
@@ -499,8 +545,11 @@ select,input[type=text]{width:100%;padding:10px;border-radius:6px;background:var
   .seatrow input{flex:1 1 100%}
 }
 @media (max-width:420px){
-  .tool{padding:0 7px;letter-spacing:.06em}
-  .purse{padding:0 9px;font-size:12px}
+  .topbar{padding-bottom:2px}
+  .mark{flex:1 1 100%;padding:10px 12px 4px}
+  .tools{flex:1 1 100%;justify-content:flex-start;padding:4px 12px 8px}
+  .tool{padding:0 9px;letter-spacing:.06em}
+  .purse{padding:0 10px;font-size:12px}
   .deed{width:56px;height:76px}
 }
 </style>
@@ -1222,18 +1271,6 @@ const ACTIONS = {
   },
 
   /* --- housekeeping ------------------------------------------------------- */
-  ADJUST_CASH: {
-    // payload: {player, amount}
-    check(st, a) {
-      if (!st.players[a.player]) return 'No such player';
-      return isHost(st, a) ? null : 'Only the host can correct the books';
-    },
-    apply(st, a) {
-      st.players[a.player].money += a.amount;
-      say(st, st.players[a.player].name + ' cash corrected by ' + money(a.amount) + '.');
-    },
-  },
-
   SET_FIRST: {
     // payload: {player}
     check(st, a) {
@@ -1248,27 +1285,26 @@ const ACTIONS = {
     },
   },
 
-  SET_ROAD_RULE: {
-    // payload: {on}
-    check(st, a) { return isHost(st, a) ? null : 'Only the host can change the house rules'; },
-    apply(st, a) {
-      st.roadRule = !!a.on;
-      say(st, 'Street frontage rule turned ' + (a.on ? 'on' : 'off') + '.');
-    },
-  },
-
   /* --- online housekeeping ------------------------------------------------ */
   DROP_PLAYER: {
     // payload: {player}. Their lots and shops freeze where they stand.
     check(st, a) {
-      if (!isHost(st, a)) return 'Only the host can remove a player';
       if (!st.players[a.player]) return 'No such player';
-      if (a.player === st.host) return 'The host cannot remove themselves';
       if (gone(st, a.player)) return 'Already gone';
+      // You can always walk away yourself; otherwise it takes the host.
+      const self = a.by !== undefined && a.by === a.player;
+      if (!self && !isHost(st, a)) return 'Only the host can remove a player';
+      const left = st.players.filter(p => !gone(st, p.id) && p.id !== a.player);
+      if (!left.length) return 'That would empty the table';
       return null;
     },
     apply(st, a) {
       st.departed.push(a.player);
+      // The controls cannot leave with them.
+      if (st.host === a.player) {
+        const next = st.players.find(p => !gone(st, p.id));
+        if (next) { st.host = next.id; say(st, next.name + ' is now the host.'); }
+      }
       st.offers = (st.offers || []).filter(o => o.from !== a.player && o.to !== a.player);
       say(st, st.players[a.player].name + ' left the table. Their estate is frozen.');
       // Never leave the table waiting on someone who is not coming back.
@@ -1525,7 +1561,7 @@ class MemoryTransport {
   async createRoom(cfg) {
     const code = newRoomCode();
     this.server.rooms[code] = {
-      meta: {created: this.server.now(), startCash: cfg.startCash, roadRule: true,
+      meta: {created: this.server.now(), startCash: cfg.startCash, roadRule: cfg.roadRule !== false,
              hostToken: cfg.token, seats: cfg.seats, started: false},
       seats: [], log: [], seed: null, presence: {}, watchers: [],
     };
@@ -1646,37 +1682,6 @@ function explainFirebase(err, doing) {
   return msg;
 }
 
-/* Walks the whole path in order and reports the first thing that fails, so a
-   setup problem names itself instead of surfacing as a puzzle. */
-async function checkConnection() {
-  const out = [];
-  const step = async (label, fn) => {
-    try { const r = await fn(); out.push({label, ok: true, note: r || ''}); return true; }
-    catch (e) { out.push({label, ok: false, note: explainFirebase(e, label)}); return false; }
-  };
-  if (!firebaseReady()) {
-    out.push({label: 'Config', ok: false, note: 'FIREBASE_CONFIG has no databaseURL, so the app is offline-only.'});
-    return out;
-  }
-  out.push({label: 'Config', ok: true, note: FIREBASE_CONFIG.databaseURL});
-  const t = new FirebaseTransport();
-  if (!await step('Load the SDK and sign in', () => t.connect())) return out;
-  const probe = 'PROBE-' + Math.floor(rnd(9000) + 1000);
-  t.code = probe;
-  if (!await step('Write to the database', () => t.m.set(t.ref('meta'), {
-    created: t.m.serverTimestamp(), startCash: 50000, roadRule: true,
-    hostToken: 'probe', seats: 3, started: false,
-  }))) return out;
-  await step('Read it back', async () => {
-    const snap = await t.m.get(t.ref('meta'));
-    return snap.exists() ? 'room reads back fine' : 'wrote nothing';
-  });
-  await step('Claim a seat', () => t.claimSeat(0, 'probe', 'probe'));
-  await step('Append to the log', () => t.append({type: 'PROBE'}));
-  await step('Clean up', () => t.m.set(t.ref(), null));
-  return out;
-}
-
 class FirebaseTransport {
   constructor() { this.watchers = []; this.unsubs = []; }
 
@@ -1715,7 +1720,7 @@ class FirebaseTransport {
       try {
         await this.m.set(this.ref('meta'), {
           created: this.m.serverTimestamp(), startCash: cfg.startCash,
-          roadRule: true, hostToken: cfg.token, seats: cfg.seats, started: false,
+          roadRule: cfg.roadRule !== false, hostToken: cfg.token, seats: cfg.seats, started: false,
         });
       } catch (e) {
         throw new Error(explainFirebase(e, 'creating the room'));
@@ -1881,6 +1886,13 @@ const Session = {
         const sig = pack(room.seed);
         if (this.seedSig !== sig) { this.seedSig = sig; Store.load({seed: room.seed, log: room.log}); }
         else Store.receive(room.log);
+        // Tell people when the controls change hands, rather than letting the
+        // buttons quietly appear somewhere new.
+        const host = Store.state ? Store.state.host : null;
+        if (this.lastHost !== null && this.lastHost !== undefined && host !== this.lastHost)
+          toast(host === this.seat ? 'You are the host now'
+                                   : Store.state.players[host].name + ' is the host now');
+        this.lastHost = host;
       }
       if (this.onRoom) this.onRoom(room);
     });
@@ -1943,7 +1955,7 @@ const app = document.getElementById('app');
 const esc = v => String(v).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 // Local scratch, never part of the game.
-let UI = {screen:'lobby', count:4, names:['','','','',''], cash:CASH_DEFAULT,
+let UI = {screen:'lobby', count:4, names:['','','','',''], cash:CASH_DEFAULT, roadRule:true,
           pick:null, selTile:null, sel:null, filter:null, me:null,
           sheet:null, gateCb:null, trade:null, fixWho:null, wipe:false};
 
@@ -1954,20 +1966,19 @@ const P = i => Store.state.players[i];
    put it back after, so reading the lot inspector does not fling you to the
    top every time somebody else acts. */
 function keepScroll(fn) {
-  const rail = document.querySelector('.rail');
-  const pane = document.querySelector('.boardpane');
-  const scroller = document.querySelector('.stage');
-  const y = {rail: rail ? rail.scrollTop : 0,
-             pane: pane ? pane.scrollTop : 0,
-             stage: scroller ? scroller.scrollTop : 0,
+  const get = sel => document.querySelector(sel);
+  const map = get('.boardscroll');
+  const y = {rail: (get('.rail') || {}).scrollTop || 0,
+             pane: (get('.boardpane') || {}).scrollTop || 0,
+             stage: (get('.stage') || {}).scrollTop || 0,
+             mapX: map ? map.scrollLeft : 0,           // sideways on a phone
              page: window.scrollY || 0};
   fn();
-  const r2 = document.querySelector('.rail');
-  const p2 = document.querySelector('.boardpane');
-  const s2 = document.querySelector('.stage');
+  const r2 = get('.rail'), p2 = get('.boardpane'), s2 = get('.stage'), m2 = get('.boardscroll');
   if (r2 && y.rail) r2.scrollTop = y.rail;
   if (p2 && y.pane) p2.scrollTop = y.pane;
   if (s2 && y.stage) s2.scrollTop = y.stage;
+  if (m2 && y.mapX) m2.scrollLeft = y.mapX;
   if (y.page) window.scrollTo(0, y.page);
 }
 
@@ -2068,27 +2079,21 @@ function board(st) {
   return h + '</div>';
 }
 
-/* The plaza is the one block with nothing for sale, so the calendar lives
-   there: six years round a dial with a marker on the current one. */
+/* The plaza is the one block with nothing for sale, so the calendar stands
+   there: a brass plate with the six years struck into it and a marker resting
+   on the current one. */
 function yearWheel(st) {
-  const cx = 50, cy = 50, r = 37;
   const now = Math.min(st.round, 6) - 1;
-  const spokes = YEARS.map((y, i) => {
-    const ang = (i / 6) * Math.PI * 2 - Math.PI / 2;
-    const x = cx + Math.cos(ang) * r, py = cy + Math.sin(ang) * r;
-    const on = i === now, past = i < now;
-    return `<div class="tick ${on ? 'now' : past ? 'past' : ''}"
-      style="left:${x}%;top:${py}%"><b>${String(y.y).slice(2)}</b></div>`;
-  }).join('');
-  const ang = (now / 6) * Math.PI * 2 - Math.PI / 2;
-  const pr = r * 0.52;                       // the marker orbits inside the numbers
-  const px = cx + Math.cos(ang) * pr, py = cy + Math.sin(ang) * pr;
-  return `<div class="wheel" style="left:80.6%;top:61.6%;width:15.4%;height:22.9%">
-    <div class="dial"></div>
-    ${spokes}
-    <div class="pawn" style="left:${px}%;top:${py}%"></div>
-    <div class="hub"><b>${YEARS[now].y}</b><span>${YEARS[now].z}</span>
-      <i>YEAR ${now + 1} OF 6</i></div>
+  return `<div class="plate" style="left:79.5%;top:59%;width:17.5%;height:30%">
+    <div class="face">
+      <div class="crest">CHINATOWN</div>
+      <div class="bigyear">${YEARS[now].y}</div>
+      <div class="zod">YEAR OF THE ${YEARS[now].z}</div>
+      <div class="years">${YEARS.map((y, i) => `<span class="${
+        i === now ? 'now' : i < now ? 'past' : ''}">${String(y.y).slice(2)}</span>`).join('')}</div>
+      <div class="rule2"></div>
+      <div class="foot2">${now + 1} OF 6 · ${PHASE_COPY[st.phase] ? PHASE_COPY[st.phase].t : 'ACCOUNTS'}</div>
+    </div>
   </div>`;
 }
 
@@ -2525,47 +2530,75 @@ income: st => {
 },
 
 rules: st => wrap('How a year runs', `
-  <ol style="margin:0;padding-left:18px;font:400 13.5px/1.8 var(--sans);color:#b6bdc8">
-    <li><b>Deal buildings.</b> Take a handful of cards, keep a set number, stake those lots.</li>
-    <li><b>Draw tiles.</b> Blind from the bag, revealed together.</li>
-    <li><b>Negotiate.</b> Lots, built shops, loose tiles, cash — anything goes.</li>
-    <li><b>Build.</b> In turn order, place tiles on your own empty lots. They never move again.</li>
+  <ol class="ruleslist">
+    <li><b>Deal buildings.</b> Everyone is dealt a hand and keeps a set number. Nothing shows on the board until the last person has chosen.</li>
+    <li><b>Draw tiles.</b> Each player reaches into the bag themselves.</li>
+    <li><b>Negotiate.</b> Lots, built shops, loose tiles, cash — anything goes. Whatever an offer names is locked until it is answered.</li>
+    <li><b>Build.</b> In turn order, place tiles on your own empty lots. You can take one back down until you finish your turn; after that a sign is permanent.</li>
     <li><b>Settle rents.</b> Six years, then the richest player wins.</li>
   </ol>
+
   <div class="lbl">What counts as one business</div>
-  <p style="margin:0;font:400 13px/1.5 var(--sans);color:#a8b0bc">Same shop type, same owner, touching side by side inside one block. Streets and the block's own buildings break the chain. A run longer than the shop's maximum splits into a complete business plus the leftovers.</p>
-  <div class="lbl">Street frontage</div>
-  <p style="margin:0;font:400 13px/1.5 var(--sans);color:#a8b0bc">A business only earns if one of its lots faces a street. Hatched lots sit in the middle of a block or behind a building that was never for sale, so on their own they take no custom. Grow out to a corner and the whole run starts earning. Switch this off in table settings to play it straight.</p>
-  <div class="lbl">Payouts</div>
-  <table class="led"><thead><tr><th>Tiles</th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th><th>6</th></tr></thead><tbody>
-    <tr><td>Growing</td>${[1,2,3,4,5].map(n => `<td class="n">${money(payPart(st, n))}</td>`).join('')}<td class="n">—</td></tr>
-    <tr><td>Complete</td><td class="n">—</td><td class="n">—</td>${[3,4,5,6].map(n => `<td class="g">${money(payFull(st, n))}</td>`).join('')}</tr>
-  </tbody></table>
+  <p class="rulesp">Same shop type, same owner, touching side by side inside one block. Streets and the block's own buildings break the chain. A run longer than the shop's maximum splits into a complete business plus the leftovers.</p>
+
+  <div class="lbl">Street frontage${st.roadRule ? '' : ' · off this game'}</div>
+  <p class="rulesp">${st.roadRule
+    ? 'A business only earns if one of its lots faces a street. Hatched lots sit in the middle of a block or behind a building that was never for sale, so on their own they take no custom. Grow out to a corner and the whole run starts earning.'
+    : 'Switched off for this game: every business pays wherever it stands.'}</p>
+
+  <div class="lbl">What each business pays</div>
+  <div class="paylist">
+    ${[1,2,3,4,5].map(n => `<div class="payrow">
+      <span class="n">${n}</span>
+      <span class="w">Growing</span>
+      <span class="v">${money(payPart(st, n))}</span></div>`).join('')}
+    ${[3,4,5,6].map(n => `<div class="payrow full">
+      <span class="n">${n}</span>
+      <span class="w">Complete</span>
+      <span class="v">${money(payFull(st, n))}</span></div>`).join('')}
+  </div>
+
   <div class="lbl">The twelve shops</div>
-  <div class="rack">${SHOPS.map(sh => `<div class="tile" style="background:${sh.bg};color:${sh.fg}">
-    <em>${sh.g}</em><b>${sh.n.toUpperCase()}</b><i>MAX ${sh.max}</i></div>`).join('')}</div>`),
+  <div class="shoplist">${SHOPS.map(sh => `<div class="shoprow" style="--bg:${sh.bg};--fg:${sh.fg}">
+    <span class="sign"><em>${sh.g}</em></span>
+    <b>${sh.n}</b><span class="meta">MAX ${sh.max}</span></div>`).join('')}</div>`),
 
 menu: st => wrap('Table settings', `
   ${Session.online() ? `<div class="lbl">Room</div>
     <div class="code small">${esc(Session.code)}</div>
-    <button class="act quiet slim" data-act="copy-code">COPY THE CODE</button>` : ''}
-  ${Session.online() && Session.amHost() ? `<div class="lbl">Remove a player · their estate freezes</div>
-    <div class="pills">${st.players.filter(p => p.id !== st.host && (st.departed || []).indexOf(p.id) < 0)
-      .map(p => `<button class="pill" data-act="kick" data-i="${p.id}">
-        <span class="cd" style="background:${hex(p.id)}"></span>${esc(p.name)}</button>`).join('') || '<span class="none">nobody to remove</span>'}</div>` : ''}
-  <div class="lbl">First player card</div>
-  <div class="pills">${st.players.map(p => `<button class="pill ${st.first === p.id ? 'on' : ''}" data-act="set-first" data-i="${p.id}">
-    <span class="cd" style="background:${hex(p.id)}"></span>${esc(p.name)}</button>`).join('')}</div>
-  <div class="lbl">Cash correction</div>
-  <div class="pills">${st.players.map(p => `<button class="pill ${UI.fixWho === p.id ? 'on' : ''}" data-act="fix-who" data-i="${p.id}">
-    <span class="cd" style="background:${hex(p.id)}"></span>${esc(p.name)}</button>`).join('')}</div>
-  ${UI.fixWho !== null ? `<div class="pills" style="margin-top:8px">${[10000, 50000, 100000, -10000, -50000, -100000]
-    .map(v => `<button class="pill" data-act="fix" data-v="${v}">${v > 0 ? '+' : ''}${money(v)}</button>`).join('')}</div>` : ''}
+    <button class="act quiet slim" data-act="copy-code">COPY THE CODE</button>
+    <div class="lbl">Who holds the controls</div>
+    <div class="waitlist">${st.players.filter(p => !gone(st, p.id)).map(p =>
+      `<div class="waitrow ${st.host === p.id ? 'done' : ''}">
+        <span class="disc" style="width:14px;height:14px;background:${hex(p.id)}"></span>
+        <b>${esc(p.name)}${Session.seat === p.id ? ' (you)' : ''}</b>
+        <span class="meta">${st.host === p.id ? 'HOST' : ''}</span></div>`).join('')}</div>` : ''}
+
+  ${Session.online() && Session.amHost() ? `<div class="lbl">Remove a player</div>
+    <p style="margin:0 0 8px;font:400 12.5px/1.45 var(--sans);color:#a8b0bc">Their lots and shops freeze where they stand and the table stops waiting on them. It cannot be undone.</p>
+    <div class="pills">${st.players.filter(p => p.id !== Session.seat && !gone(st, p.id))
+      .map(p => `<button class="pill ${UI.kickWho === p.id ? 'on' : ''}" data-act="kick-who" data-i="${p.id}">
+        <span class="cd" style="background:${hex(p.id)}"></span>${esc(p.name)}</button>`).join('')
+      || '<span class="none">nobody to remove</span>'}</div>
+    ${UI.kickWho !== null && UI.kickWho !== undefined
+      ? `<button class="act danger slim" data-act="kick-do" data-i="${UI.kickWho}">REMOVE ${esc(P(UI.kickWho).name).toUpperCase()} FOR GOOD</button>` : ''}` : ''}
+
+  ${!Session.online() ? `<div class="lbl">First player card</div>
+    <div class="pills">${st.players.map(p => `<button class="pill ${st.first === p.id ? 'on' : ''}" data-act="set-first" data-i="${p.id}">
+      <span class="cd" style="background:${hex(p.id)}"></span>${esc(p.name)}</button>`).join('')}</div>` : ''}
+
   <div class="lbl">House rule · street frontage</div>
-  <div class="pills"><button class="pill ${st.roadRule ? 'on' : ''}" data-act="rule-road">${st.roadRule ? 'ON' : 'OFF'}</button></div>
-  <p style="margin:8px 0 0;font:400 12.5px/1.45 var(--sans);color:#a8b0bc">A business pays nothing unless one of its lots faces a street. Hatched lots on the map are the ones with no frontage.</p>
-  <div class="lbl">Start over</div>
-  <button class="act quiet slim danger-hint" data-act="restart">ABANDON THIS GAME</button>`),
+  <p style="margin:0;font:400 12.5px/1.45 var(--sans);color:#a8b0bc">${st.roadRule
+    ? 'On. A business pays nothing unless one of its lots faces a street — the hatched lots have none. Fixed for this game.'
+    : 'Off for this game. Every business pays wherever it stands.'}</p>
+
+  ${Session.online()
+    ? `<div class="lbl">Leave</div>
+       <p style="margin:0 0 8px;font:400 12.5px/1.45 var(--sans);color:#a8b0bc">Your lots and shops stay on the board, frozen. You cannot come back.</p>
+       <button class="act ${UI.leaveArmed ? 'danger' : 'quiet'} slim" data-act="leave-game">${
+         UI.leaveArmed ? 'YES — LEAVE FOR GOOD' : 'LEAVE THIS GAME'}</button>`
+    : `<div class="lbl">Start over</div>
+       <button class="act quiet slim danger-hint" data-act="restart">ABANDON THIS GAME</button>`}`),
 
 end: st => {
   const rank = st.players.slice().sort((a, b) => b.money - a.money || shopsOnBoard(st, b.id) - shopsOnBoard(st, a.id));
@@ -2580,16 +2613,6 @@ end: st => {
 },
 
 // Building an offer to send. Left is what I hand over, right is what I want.
-diag: (st, d) => wrap('Connection check',
-  (d.rows || []).map(r => `<div class="diagrow ${r.ok ? 'ok' : 'bad'}">
-      <span class="mark">${r.ok ? '✓' : '✕'}</span>
-      <span><b>${esc(r.label)}</b>${r.note ? `<span>${esc(r.note)}</span>` : ''}</span>
-    </div>`).join('')
-  + (d.busy ? '<p style="margin-top:14px" class="meta">CHECKING…</p>' : '')
-  + (!d.busy && (d.rows || []).every(r => r.ok)
-      ? '<p style="margin-top:16px;font:400 14px/1.5 var(--sans);color:var(--jade)">Everything is wired up. Rooms will work across devices.</p>'
-      : '')),
-
 compose: st => {
   const d = UI.compose;
   const me = Session.seat;
@@ -2768,13 +2791,8 @@ function renderSetup() {
         <input type="text" id="nm${i}" maxlength="14" placeholder="${COLORS[i].n}" value="${esc(names[i] || '')}">
       </div>`).join('')}
       <div class="lbl">Starting cash <span class="meta" style="margin-left:6px">EACH PLAYER</span></div>
-      <div class="cashset">
-        <output id="cashOut" class="mono">${money(UI.cash)}</output>
-        <input type="range" id="cashRange" min="${CASH_MIN}" max="${CASH_MAX}" step="${CASH_STEP}" value="${UI.cash}">
-        <div class="rowbet"><span class="meta">${money(CASH_MIN)}</span>
-          <span class="meta">${UI.cash === CASH_DEFAULT ? 'STANDARD' : 'HOUSE ECONOMY'}</span>
-          <span class="meta">${money(CASH_MAX)}</span></div>
-      </div>
+      ${cashSlider()}
+      ${roadRuleChoice()}
       <button class="act" data-act="start">DEAL THE FIRST YEAR</button>
     </div></div>`;
   renderSheet();
@@ -2793,8 +2811,8 @@ function renderHost() {
       <input type="text" id="myname" maxlength="14" placeholder="Host" value="${esc(UI.myName || '')}"></div>
     <div class="lbl">Starting cash <span class="meta" style="margin-left:6px">EACH PLAYER</span></div>
     ${cashSlider()}
+    ${roadRuleChoice()}
     <button class="act" data-act="host-go">CREATE THE ROOM</button>
-    <button class="act quiet slim" data-act="check-conn">TEST THE CONNECTION</button>
     <p class="meta" style="margin-top:14px;text-align:center">SYNCING VIA ${backend.toUpperCase()}</p>`);
   renderSheet();
 }
@@ -2810,8 +2828,7 @@ function renderJoin() {
     <div class="lbl">Your name</div>
     <div class="seatrow"><span class="disc" style="background:#3a4557"></span>
       <input type="text" id="myname" maxlength="14" placeholder="Your name" value="${esc(UI.myName || '')}"></div>
-    <button class="act" data-act="join-go">FIND THE ROOM</button>
-    <button class="act quiet slim" data-act="check-conn">TEST THE CONNECTION</button>`);
+    <button class="act" data-act="join-go">FIND THE ROOM</button>`);
   renderSheet();
 }
 
@@ -2838,7 +2855,10 @@ function renderRoom() {
       // choose, they light up; once someone is in them they go solid.
       const cls = s ? (isMine ? 'seat mine' : 'seat filled')
                     : (mine === null ? 'seat open' : 'seat empty');
-      const isHostSeat = room.meta.hostToken && s && s.token === room.meta.hostToken;
+      // Once a game is running the state decides, not whoever opened the room.
+      const hostSeat = Store.state ? Store.state.host
+                     : room.seats.findIndex(x => x && x.token === room.meta.hostToken);
+      const isHostSeat = i === hostSeat;
       // Only an empty seat, and only while you have none, is worth tapping.
       const pickable = !s && mine === null;
       return `<button class="${cls}" ${pickable ? `data-act="take-seat" data-i="${i}"` : ''}>
@@ -2864,6 +2884,17 @@ const shell = body => `<header class="topbar">
       <button class="tool" data-act="rules-cold">RULES</button></div></header>
   <div class="stage" style="overflow:auto"><div class="lobby">${body}</div></div>`;
 
+// Settled before the first card is dealt, and fixed for the whole game.
+const roadRuleChoice = () => `<div class="lbl">Street frontage rule
+    <span class="meta" style="margin-left:6px">FIXED ONCE THE GAME STARTS</span></div>
+  <div class="pills">
+    <button class="pill ${UI.roadRule ? 'on' : ''}" data-act="road-rule" data-v="1">ON</button>
+    <button class="pill ${UI.roadRule ? '' : 'on'}" data-act="road-rule" data-v="0">OFF</button>
+  </div>
+  <p style="margin:8px 0 0;font:400 12.5px/1.45 var(--sans);color:#a8b0bc">${UI.roadRule
+    ? 'A business earns nothing unless one of its lots faces a street. Hatched lots on the map have none.'
+    : 'Played straight: every business pays wherever it stands.'}</p>`;
+
 const cashSlider = () => `<div class="cashset">
     <output id="cashOut" class="mono">${money(UI.cash)}</output>
     <input type="range" id="cashRange" min="${CASH_MIN}" max="${CASH_MAX}" step="${CASH_STEP}" value="${UI.cash}">
@@ -2883,7 +2914,7 @@ function readSetup() {
 function startGame() {
   readSetup();
   const names = Array.from({length:UI.count}, (_, i) => (UI.names[i] || '').trim() || COLORS[i].n);
-  Session.offline({names, startCash:UI.cash, first:rnd(names.length)});
+  Session.offline({names, startCash:UI.cash, roadRule:UI.roadRule, first:rnd(names.length)});
   UI.screen = 'game'; UI.sel = null; UI.selTile = null; UI.me = null; UI.pick = null;
   saveSoon(); render();
 }
@@ -2915,7 +2946,7 @@ async function hostRoom() {
   busy(true, 'Creating the room');
   try {
     Session.onRoom = onRoomChange;
-    await Session.host(transport(), {startCash: UI.cash, seats: UI.count});
+    await Session.host(transport(), {startCash: UI.cash, roadRule: UI.roadRule, seats: UI.count});
     // The host does not get to pick either: a seat is drawn for them.
     await Session.take(rnd(UI.count), (UI.myName || '').trim() || 'Host');
     UI.screen = 'room'; renderRoom();
@@ -2941,7 +2972,8 @@ async function startRoomGame() {
   const names = room.seats.map((s, i) => (s && s.name) || COLORS[i].n);
   busy(true, 'Dealing the first year');
   try {
-    await Session.begin({names, startCash: room.meta.startCash || CASH_DEFAULT, first: rnd(names.length)});
+    await Session.begin({names, startCash: room.meta.startCash || CASH_DEFAULT,
+                         roadRule: room.meta.roadRule !== false, first: rnd(names.length)});
     UI.screen = 'game'; render();
   } catch (e) { toast(e.message); }
   finally { busy(false); }
@@ -3007,12 +3039,20 @@ document.addEventListener('click', e => {
   switch (act) {
     /* lobby */
     case 'go-setup': UI.screen = 'setup'; renderSetup(); break;
+    case 'count': readSetup(); UI.count = v; renderSetup(); break;
+    case 'start': startGame(); break;
+    case 'resume': UI.screen = 'game'; render(); break;
+    case 'rules-cold': openSheet('rules'); break;
     case 'back-lobby':
       Session.leave().then(() => { UI.screen = 'lobby'; renderLobby(); });
       break;
     case 'go-host': clearLocalGame(); UI.screen = 'host'; renderHost(); break;
     case 'go-join': clearLocalGame(); UI.screen = 'join'; renderJoin(); break;
     case 'host-seats': UI.count = v; renderHost(); break;
+    case 'road-rule':
+      readSetup(); UI.roadRule = !!v;
+      UI.screen === 'host' ? renderHost() : renderSetup();
+      break;
     case 'host-go': hostRoom(); break;
     case 'join-go': joinRoom(); break;
     case 'take-seat':
@@ -3028,17 +3068,6 @@ document.addEventListener('click', e => {
         .finally(() => busy(false));
       break;
     case 'copy-code': copyText(Session.code, el); break;
-    case 'check-conn':
-      openSheet('diag', {rows: [], busy: true});
-      checkConnection().then(rows => openSheet('diag', {rows, busy: false}));
-      break;
-    case 'kick':
-      if (send({type: 'DROP_PLAYER', player: i})) { closeSheet(); render(); }
-      break;
-    case 'resume': UI.screen = 'game'; render(); break;
-    case 'count': readSetup(); UI.count = v; renderSetup(); break;
-    case 'start': startGame(); break;
-    case 'rules-cold': openSheet('rules'); break;
 
     /* sheets */
     case 'close': closeSheet(); break;
@@ -3046,7 +3075,7 @@ document.addEventListener('click', e => {
     case 'log': openSheet('log'); break;
     case 'copy-log': copyLog(el); break;
     case 'rules': openSheet('rules'); break;
-    case 'menu': UI.fixWho = null; openSheet('menu'); break;
+    case 'menu': UI.kickWho = null; UI.leaveArmed = false; openSheet('menu'); break;
     case 'whoami': openSheet('whoami'); break;
     case 'income-detail': openSheet('income'); break;
     case 'hide-me': UI.me = null; render(); break;
@@ -3087,6 +3116,25 @@ document.addEventListener('click', e => {
     case 'trade':
       UI.trade = {a:0, b:1, aMoney:0, bMoney:0, aTiles:[], bTiles:[], aLots:[], bLots:[]};
       openSheet('trade'); break;
+    case 't-do': {
+      // The sheet picks tiles by their place in each hand. The TRADE action names
+      // them by kind, so turn the picked places into kinds now, from the hands as
+      // they stand. Places are stable while the sheet is open: changing the player
+      // clears the picks.
+      const t = UI.trade;
+      const kindsOf = (who, places) => places.map(i => P(who).tiles[i]);
+      const deal = {type:'TRADE', a:t.a, b:t.b, aMoney:t.aMoney, bMoney:t.bMoney,
+        aTiles:kindsOf(t.a, t.aTiles), bTiles:kindsOf(t.b, t.bTiles), aLots:t.aLots, bLots:t.bLots};
+      if (send(deal)) { closeSheet(); render(); toast('Deal recorded'); }
+      break;
+    }
+    case 'end-trade': send({type:'END_TRADE'}); UI.selTile = null; render(); break;
+    case 'pick-tile': UI.selTile = UI.selTile === i ? null : i; render(); break;
+    case 'end-build': send({type:'END_BUILD', player:st.turn}); UI.selTile = null; render(); break;
+    case 'pay':
+      if (send({type:'PAYOUT'})) { UI.sel = null; render(); if (Store.state.phase === 'over') openSheet('end'); }
+      break;
+    case 'set-first': if (send({type:'SET_FIRST', player:i})) { closeSheet(); render(); } break;
 
     case 'new-offer': {
       const other = st.players.find(p => p.id !== Session.seat && !gone(st, p.id));
@@ -3094,27 +3142,6 @@ document.addEventListener('click', e => {
       UI.compose = {to: other.id, fromMoney:0, toMoney:0,
                     fromTiles:[], toTiles:[], fromLots:[], toLots:[]};
       openSheet('compose'); break;
-    }
-    // These three touch nothing but the composer, so they update the few
-    // elements that changed rather than rebuilding the sheet. Rebuilding felt
-    // like lag and threw away the scroll position.
-    case 'c-money':
-      UI.compose[tag + 'Money'] = v === 0 ? 0 : UI.compose[tag + 'Money'] + v;
-      refreshCompose(); break;
-    case 'c-tile': {
-      const arr = UI.compose[tag + 'Tiles'];
-      const have = +el.dataset.have || 0;
-      const want = countIn(arr, k);
-      UI.compose[tag + 'Tiles'] = arr.filter(x => x !== k);
-      const next = want >= have ? 0 : want + 1;                     // cycle up, then back to none
-      for (let n = 0; n < next; n++) UI.compose[tag + 'Tiles'].push(k);
-      refreshCompose(); break;
-    }
-    case 'c-lot': {
-      const arr = UI.compose[tag + 'Lots'], at = arr.indexOf(i);
-      at >= 0 ? arr.splice(at, 1) : arr.push(i);
-      el.classList.toggle('on', at < 0);                            // instant, before anything else
-      refreshCompose(); break;
     }
     case 'c-send': {
       const d = UI.compose;
@@ -3139,21 +3166,24 @@ document.addEventListener('click', e => {
         fromLots: o.toLots.slice(), toLots: o.fromLots.slice()};
       openSheet('compose'); break;
     }
-    case 't-do':
-      if (send({type:'TRADE', ...UI.trade})) { closeSheet(); render(); toast('Deal recorded'); }
-      break;
-    case 'end-trade': send({type:'END_TRADE'}); UI.selTile = null; render(); break;
-    case 'pick-tile': UI.selTile = UI.selTile === i ? null : i; render(); break;
-    case 'end-build': send({type:'END_BUILD', player:st.turn}); UI.selTile = null; render(); break;
-    case 'pay':
-      if (send({type:'PAYOUT'})) { UI.sel = null; render(); if (Store.state.phase === 'over') openSheet('end'); }
-      break;
 
-    /* settings */
-    case 'set-first': if (send({type:'SET_FIRST', player:i})) { closeSheet(); render(); } break;
-    case 'fix-who': UI.fixWho = UI.fixWho === i ? null : i; renderSheet(); break;
-    case 'fix': send({type:'ADJUST_CASH', player:UI.fixWho, amount:v}); renderSheet(); render(); break;
-    case 'rule-road': send({type:'SET_ROAD_RULE', on:!st.roadRule}); renderSheet(); render(); break;
+    case 'kick-who': UI.kickWho = UI.kickWho === i ? null : i; renderSheet(); break;
+    case 'kick-do':
+      if (send({type:'DROP_PLAYER', player:i})) {
+        UI.kickWho = null;
+        toast(P(i).name + ' has been removed');
+        closeSheet(); render();
+      }
+      break;
+    case 'leave-game':
+      if (!UI.leaveArmed) { UI.leaveArmed = true; renderSheet(); break; }
+      UI.leaveArmed = false;
+      send({type:'DROP_PLAYER', player:Session.seat});
+      busy(true, 'Leaving');
+      setTimeout(() => Session.leave().then(() => {
+        clearLocalGame(); UI.screen = 'lobby'; busy(false); renderLobby();
+      }), 400);
+      break;
     case 'undo':
       closeSheet();
       if (Session.online() && !Session.amHost()) { toast('Only the host can undo'); break; }
